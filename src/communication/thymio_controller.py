@@ -37,52 +37,28 @@ class ThymioController:
         self.connected = False
 
         # Commandes disponibles
-        self.commands: Dict[str, Callable] = { 
+        self.commands: Dict[str, str] = { 
             # Commandes de mouvement
-            "avancer": """
-                        motor.left.target = [200] 
-                        motor.right.target = [200]
-                        """,
+            "avancer": "motor.left.target = 200\nmotor.right.target = 200",
                         
-            "reculer": """
-                        motor.left.target = [-200] 
-                        motor.right.target = [-200]
-                        """,
+            "reculer": "motor.left.target = -200\nmotor.right.target = -200",
 
-            "arreter": """
-                        motor.left.target = [0]
-                        motor.right.target = [0]
-                        """,
+            "arreter": "motor.left.target = 0\nmotor.right.target = 0",
 
-            "tourner_gauche": """
-                        motor.left.target = [-100] 
-                        motor.right.target = [100]
-                        """,
+            "tourner_gauche": "motor.left.target = -100\nmotor.right.target = 100",
 
-            "tourner_droite": """
-                        motor.left.target = [100]
-                        motor.right.target = [-100]
-                        """,
+            "tourner_droite": "motor.left.target = 100\nmotor.right.target = -100",
 
             # Commandes de contrôle des LEDs en haut
-            "led_rouge": """
-                        call leds.top(32,0,0)
-                        """,
+            "led_rouge": "call leds.top(32,0,0)",
             
-            "led_vert": """
-                        call leds.top(0,32,0)
-                        """,
+            "led_vert": "call leds.top(0,32,0)",
             
-            "led_bleu": """
-                        call leds.top(0,0,32)
-                        """,    
+            "led_bleu": "call leds.top(0,0,32)",    
             
-            "led_eteindre": """
-                        call leds.top(0, 0, 0)
-                        """,
+            "led_eteindre": "call leds.top(0,0,0)",
 
-            "pass": """
-                    """
+            "pass": ""
         }
 
     async def connect(self):
@@ -103,8 +79,10 @@ class ThymioController:
                 if self.node:
                     await self.node.lock_node()
                     await self.client.wait_for_status(self.client.NODE_STATUS_READY)
+                    
                     self.connected = True
                     print(f"Connecté au robot Thymio (ID: {self.node.id_str})")
+                    
                     return True
                 else:
                     print("Aucun robot Thymio détecté")
@@ -130,7 +108,7 @@ class ThymioController:
             bool: True si la commande a été exécutée avec succès, False sinon
         """
         if not self.connected or not self.node:
-            print("Robot non connecté")
+            print("❌ Robot non connecté - impossible d'exécuter la commande")
             return False
         
         if command in self.commands:
@@ -143,24 +121,29 @@ class ThymioController:
                 return True
             
             try:
+                print(f"Compilation de la commande '{command}'...")
+                print(f"Code Thymio: {repr(self.commands[command])}")
+                
                 error = await self.node.compile(self.commands[command])
                 if error is not None:
-                    print(f"Erreur lors de l'exécution de la commande '{command}': {error['error_code']}")
+                    print(f"❌ Erreur de compilation pour '{command}': {error}")
                     return False
                 
+                print(f"▶️ Exécution de la commande '{command}'...")
                 error = await self.node.run()
                 if error is not None:
-                    print(f"Erreur lors de l'exécution de la commande '{command}': {error['error_code']}")
+                    print(f"❌ Erreur d'exécution pour '{command}': {error}")
                     return False
                 
-                print(f"Commande exécutée: {command}")
+                print(f"✅ Commande '{command}' exécutée avec succès")
                 return True
             
             except Exception as e:
-                print(f"Erreur lors de l'exécution de la commande '{command}': {e}")
+                print(f"❌ Exception lors de l'exécution de '{command}': {e}")
                 return False
         else:
-            print(f"Commande inconnue: {command}")
+            print(f"❌ Commande inconnue: '{command}'")
+            print(f"   Commandes disponibles: {list(self.commands.keys())}")
             return False
 
     async def disconnect(self):
@@ -191,4 +174,18 @@ class ThymioController:
             if loop.is_running():
                 asyncio.create_task(self.disconnect())
             else:
-                asyncio.run(self.disconnect()) 
+                asyncio.run(self.disconnect())
+                
+    def get_connection_status(self) -> dict:
+        """
+        Retourne l'état de la connexion avec des détails.
+        
+        Returns:
+            dict: Informations sur l'état de la connexion
+        """
+        return {
+            "connected": self.connected,
+            "node_available": self.node is not None,
+            "client_active": self.client is not None,
+            "node_status": getattr(self.node, 'status', 'N/A') if self.node else 'N/A'
+        }
