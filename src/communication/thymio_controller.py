@@ -117,10 +117,12 @@ if __name__ == "__main__":
                         print("❌ Commande invalide")
                 except KeyboardInterrupt:
                     print("\n👋 Déconnexion...")
+                    await controller.disconnect()
                     break
                 finally:
                     if not controller.is_connected():
                         print("❌ Déconnexion du robot Thymio")
+                        await controller.disconnect()
                         break
 
     asyncio.run(main())
