@@ -15,7 +15,7 @@ from src.voice_controller import VoiceController, VoiceCommandStatus
 
 
 class ThymioVoiceInterface:
-    """Interface ultra-simple qui fonctionne."""
+    """Interface"""
     
     def __init__(self):
         self.controller = None
