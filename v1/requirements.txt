@@ -1,0 +1,11 @@
+# Contrôle de Thymio avec Python
+tdmclient>=0.1.0 
+
+# Reconnaissance vocale
+SpeechRecognition>=3.10.0
+
+# Support audio pour le microphone
+pyaudio>=0.2.11
+
+# Packaging en exécutable
+pyinstaller>=5.0.0
