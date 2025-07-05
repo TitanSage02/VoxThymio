@@ -1,6 +1,5 @@
 """
-Interface ultra-simple de contrôle vocal pour le robot Thymio.
-Version qui fonctionne garantie !
+Interface de contrôle vocal pour le robot Thymio.
 """
 
 import asyncio

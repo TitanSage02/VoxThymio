@@ -1,8 +1,8 @@
-# 🎯 VoxThymio - Démonstration Complète
+# 🎯 VoxThymio - Démonstration complète
 
-## 🤖 Présentation du Système
+##  Présentation du système
 
-**VoxThymio** est un système de contrôle vocal intelligent pour robot Thymio, développé par **Espérance AYIWAHOUN** pour **AI4Innov**. Il offre une interface graphique moderne permettant un contrôle intuitif par la voix et par boutons.
+**VoxThymio** est un système de contrôle vocal intelligent pour robot Thymio, développé par **Espérance AYIWAHOUN** dqns le cadre du projet **TechEduc** pour **AI4Innov**. Il offre une interface graphique moderne permettant un contrôle intuitif par la voix et par boutons.
 
 ---
 
@@ -14,20 +14,20 @@
 - Calibrage automatique du microphone
 - Feedback visuel en temps réel
 
-### 🎮 **Contrôle Manuel**
+### 🎮 **Contrôle manuel**
 - Boutons directionnels intuitifs
 - Contrôles précis (avancer, reculer, tourner)
 - Stop d'urgence
 - Interface tactile moderne
 
-### 📱 **Interface Graphique Moderne**
+### 📱 **Interface graphique moderne**
 - Design Dark Theme professionnel
 - Splash screen avec branding AI4Innov
 - Journal d'activité en temps réel
 - Indicateurs d'état visuels
 - Couleurs de marque (#00d4aa)
 
-### 🔌 **Gestion de Connexion**
+### 🔌 **Gestion de connexion**
 - Détection automatique du robot
 - Connexion/déconnexion simple
 - États de connexion clairs
@@ -35,7 +35,7 @@
 
 ---
 
-## 🚀 Scénarios d'Utilisation
+## 🚀 Scénarios d'utilisation
 
 ### 🎓 **Éducation**
 - Cours de robotique et programmation
