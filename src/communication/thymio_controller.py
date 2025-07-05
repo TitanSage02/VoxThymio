@@ -1,5 +1,5 @@
 """
-Contrôleur simplifié pour le robot Thymio
+Contrôleur pour le robot Thymio
 """
 from tdmclient import ClientAsync
 import asyncio
@@ -8,7 +8,7 @@ from typing import Dict, Optional, Any
 import os 
 
 class ThymioController:
-    """Contrôleur simplifié pour le robot Thymio."""
+    """Contrôleur pour le robot Thymio."""
     
     def __init__(self):
         """Initialise le contrôleur Thymio."""
@@ -114,14 +114,14 @@ if __name__ == "__main__":
                         await controller.execute_command(command_map[command])
                         os.system("clear")
                     else:
-                        print("❌ Commande invalide")
+                        print(" Commande invalide")
                 except KeyboardInterrupt:
-                    print("\n👋 Déconnexion...")
+                    print("\n Déconnexion...")
                     await controller.disconnect()
                     break
                 finally:
                     if not controller.is_connected():
-                        print("❌ Déconnexion du robot Thymio")
+                        print(" Déconnexion du robot Thymio")
                         await controller.disconnect()
                         break
 
