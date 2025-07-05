@@ -5,6 +5,7 @@ from tdmclient import ClientAsync
 import asyncio
 import warnings
 from typing import Dict, Optional, Any
+import os 
 
 class ThymioController:
     """Contrôleur simplifié pour le robot Thymio."""
@@ -87,3 +88,39 @@ class ThymioController:
     def is_connected(self) -> bool:
         """Vérifie si le robot est connecté."""
         return self.connected and self.node is not None
+    
+if __name__ == "__main__":
+    """Point d'entrée pour tester le contrôleur."""
+    async def main():
+        controller = ThymioController()
+        if await controller.connect():
+            while True:
+                try : 
+                    print("Commandes disponibles:")
+                    print("1. avancer\n2. reculer\n3. tourner_gauche\n4. tourner_droite\n5. arreter\n6. led_rouge\n7. led_vert\n8. led_bleu\n9. led_eteindre")
+                    command = input("Entrez une commande (1-9): ")
+                    command_map = {
+                        "1": "avancer",
+                        "2": "reculer",
+                        "3": "tourner_gauche",
+                        "4": "tourner_droite",
+                        "5": "arreter",
+                        "6": "led_rouge",
+                        "7": "led_vert",
+                        "8": "led_bleu",
+                        "9": "led_eteindre"
+                    }
+                    if command in command_map:
+                        await controller.execute_command(command_map[command])
+                        os.system("clear")
+                    else:
+                        print("❌ Commande invalide")
+                except KeyboardInterrupt:
+                    print("\n👋 Déconnexion...")
+                    break
+                finally:
+                    if not controller.is_connected():
+                        print("❌ Déconnexion du robot Thymio")
+                        break
+
+    asyncio.run(main())
