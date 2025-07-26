@@ -10,8 +10,6 @@
     "tourner_droite": "motor.left.target = 100\nmotor.right.target = -100",
     "tourner_gauche_lent": "motor.left.target = -50\nmotor.right.target = 50",
     "tourner_droite_lent": "motor.left.target = 50\nmotor.right.target = -50",
-    "pivoter_gauche": "motor.left.target = -200\nmotor.right.target = 200",
-    "pivoter_droite": "motor.left.target = 200\nmotor.right.target = -200",
     "led_rouge": "call leds.top(32,0,0)",
     "led_vert": "call leds.top(0,32,0)",
     "led_bleu": "call leds.top(0,0,32)",
@@ -19,10 +17,8 @@
     "led_violet": "call leds.top(32,0,32)",
     "led_blanc": "call leds.top(32,32,32)",
     "led_eteindre": "call leds.top(0,0,0)",
-    "sol_eteindre": "call leds.bottom.left(0,0,0)\ncall leds.bottom.right(0,0,0)",
     "son_heureux": "call sound.freq(440,60)",
     "son_triste": "call sound.freq(220,60)",
-    "son_surprise": "call sound.freq(880,30)",
     "son_silence": "call sound.stop()",
     "volume_max": "call sound.system(7)",
     "volume_moyen": "call sound.system(4)",
@@ -36,6 +32,5 @@
     "note_si": "call sound.freq(494,60)",
     "demi_tour_gauche": "motor.left.target = -200\nmotor.right.target = 200\ntimer.period[0] = 2000\nonevent timer0 motor.left.target = 0\nmotor.right.target = 0",
     "demi_tour_droite": "motor.left.target = 200\nmotor.right.target = -200\ntimer.period[0] = 2000\nonevent timer0 motor.left.target = 0\nmotor.right.target = 0",
-    "arret_urgence": "motor.left.target = 0\nmotor.right.target = 0\ncall leds.top(32,0,0)\ncall sound.freq(100,60)",
     "none": ""
 }

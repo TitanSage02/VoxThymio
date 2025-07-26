@@ -1,24 +1,4 @@
 text,label
-pivote à gauche,pivoter_gauche
-demi-tour à gauche,pivoter_gauche
-tour complet vers la gauche,pivoter_gauche
-fais un virage à gauche,pivoter_gauche
-pivote complètement à gauche,pivoter_gauche
-tourne sur toi-même vers la gauche,pivoter_gauche
-rotation complète à gauche,pivoter_gauche
-retourne-toi à gauche,pivoter_gauche
-vire complètement à gauche,pivoter_gauche
-fais un 180 à gauche,pivoter_gauche
-pivote à droite,pivoter_droite
-demi-tour à droite,pivoter_droite
-tour complet vers la droite,pivoter_droite
-fais un virage à droite,pivoter_droite
-pivote complètement à droite,pivoter_droite
-tourne sur toi-même vers la droite,pivoter_droite
-rotation complète à droite,pivoter_droite
-retourne-toi à droite,pivoter_droite
-vire complètement à droite,pivoter_droite
-fais un 180 à droite,pivoter_droite
 allume la lumière rouge,led_rouge
 mets la LED rouge,led_rouge
 active le rouge,led_rouge
@@ -89,16 +69,6 @@ plus de lumière,led_eteindre
 stop lumière,led_eteindre
 éteins les LED,led_eteindre
 aucune lumière,led_eteindre
-éteins la lumière du sol,sol_eteindre
-coupe les LEDs du bas,sol_eteindre
-éteins les LEDs au sol,sol_eteindre
-éteins le bas,sol_eteindre
-désactive les lumières du bas,sol_eteindre
-lumières au sol off,sol_eteindre
-stop lumière bas,sol_eteindre
-plus de lumière en dessous,sol_eteindre
-éteins la base lumineuse,sol_eteindre
-pas de lumière au sol,sol_eteindre
 joue un son joyeux,son_heureux
 sois content,son_heureux
 fais un bruit heureux,son_heureux
@@ -119,16 +89,6 @@ bruit de chagrin,son_triste
 son mélancolique,son_triste
 tristesse,son_triste
 pleure,son_triste
-joue un son de surprise,son_surprise
-fais un bruit surpris,son_surprise
-sois surpris,son_surprise
-exprime la surprise,son_surprise
-joue un bip de surprise,son_surprise
-son étonné,son_surprise
-fais waouh,son_surprise
-son ouah,son_surprise
-bruit inattendu,son_surprise
-réaction de surprise,son_surprise
 arrête le son,son_silence
 stop musique,son_silence
 silence,son_silence
