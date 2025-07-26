@@ -1,0 +1,281 @@
+text,label
+pivote à gauche,pivoter_gauche
+demi-tour à gauche,pivoter_gauche
+tour complet vers la gauche,pivoter_gauche
+fais un virage à gauche,pivoter_gauche
+pivote complètement à gauche,pivoter_gauche
+tourne sur toi-même vers la gauche,pivoter_gauche
+rotation complète à gauche,pivoter_gauche
+retourne-toi à gauche,pivoter_gauche
+vire complètement à gauche,pivoter_gauche
+fais un 180 à gauche,pivoter_gauche
+pivote à droite,pivoter_droite
+demi-tour à droite,pivoter_droite
+tour complet vers la droite,pivoter_droite
+fais un virage à droite,pivoter_droite
+pivote complètement à droite,pivoter_droite
+tourne sur toi-même vers la droite,pivoter_droite
+rotation complète à droite,pivoter_droite
+retourne-toi à droite,pivoter_droite
+vire complètement à droite,pivoter_droite
+fais un 180 à droite,pivoter_droite
+allume la lumière rouge,led_rouge
+mets la LED rouge,led_rouge
+active le rouge,led_rouge
+passe en rouge,led_rouge
+éclaire en rouge,led_rouge
+mets une lumière rouge,led_rouge
+fais rouge,led_rouge
+lumière rouge,led_rouge
+illumine en rouge,led_rouge
+rouge s'il te plaît,led_rouge
+allume la lumière verte,led_vert
+mets la LED verte,led_vert
+active le vert,led_vert
+passe en vert,led_vert
+éclaire en vert,led_vert
+mets une lumière verte,led_vert
+fais vert,led_vert
+lumière verte,led_vert
+illumine en vert,led_vert
+vert s'il te plaît,led_vert
+allume la lumière bleue,led_bleu
+mets la LED bleue,led_bleu
+active le bleu,led_bleu
+passe en bleu,led_bleu
+éclaire en bleu,led_bleu
+mets une lumière bleue,led_bleu
+fais bleu,led_bleu
+lumière bleue,led_bleu
+illumine en bleu,led_bleu
+bleu s'il te plaît,led_bleu
+allume la lumière jaune,led_jaune
+mets la LED jaune,led_jaune
+active le jaune,led_jaune
+passe en jaune,led_jaune
+éclaire en jaune,led_jaune
+mets une lumière jaune,led_jaune
+fais jaune,led_jaune
+lumière jaune,led_jaune
+illumine en jaune,led_jaune
+jaune s'il te plaît,led_jaune
+allume la lumière violette,led_violet
+mets la LED violette,led_violet
+active le violet,led_violet
+passe en violet,led_violet
+éclaire en violet,led_violet
+mets une lumière violette,led_violet
+fais violet,led_violet
+lumière violette,led_violet
+illumine en violet,led_violet
+violet s'il te plaît,led_violet
+allume la lumière blanche,led_blanc
+mets la LED blanche,led_blanc
+active le blanc,led_blanc
+passe en blanc,led_blanc
+éclaire en blanc,led_blanc
+mets une lumière blanche,led_blanc
+fais blanc,led_blanc
+lumière blanche,led_blanc
+illumine en blanc,led_blanc
+blanc s'il te plaît,led_blanc
+éteins la lumière,led_eteindre
+coupe les LEDs,led_eteindre
+éteins les lampes,led_eteindre
+lumière off,led_eteindre
+éteins tout,led_eteindre
+désactive la lumière,led_eteindre
+plus de lumière,led_eteindre
+stop lumière,led_eteindre
+éteins les LED,led_eteindre
+aucune lumière,led_eteindre
+éteins la lumière du sol,sol_eteindre
+coupe les LEDs du bas,sol_eteindre
+éteins les LEDs au sol,sol_eteindre
+éteins le bas,sol_eteindre
+désactive les lumières du bas,sol_eteindre
+lumières au sol off,sol_eteindre
+stop lumière bas,sol_eteindre
+plus de lumière en dessous,sol_eteindre
+éteins la base lumineuse,sol_eteindre
+pas de lumière au sol,sol_eteindre
+joue un son joyeux,son_heureux
+sois content,son_heureux
+fais un bruit heureux,son_heureux
+son de bonheur,son_heureux
+joue un son positif,son_heureux
+exprime la joie,son_heureux
+musique heureuse,son_heureux
+son content,son_heureux
+sois joyeux,son_heureux
+bruit heureux,son_heureux
+joue un son triste,son_triste
+fais un bruit triste,son_triste
+exprime de la tristesse,son_triste
+son de tristesse,son_triste
+musique triste,son_triste
+sois triste,son_triste
+bruit de chagrin,son_triste
+son mélancolique,son_triste
+tristesse,son_triste
+pleure,son_triste
+joue un son de surprise,son_surprise
+fais un bruit surpris,son_surprise
+sois surpris,son_surprise
+exprime la surprise,son_surprise
+joue un bip de surprise,son_surprise
+son étonné,son_surprise
+fais waouh,son_surprise
+son ouah,son_surprise
+bruit inattendu,son_surprise
+réaction de surprise,son_surprise
+arrête le son,son_silence
+stop musique,son_silence
+silence,son_silence
+ne fais plus de bruit,son_silence
+coupe le son,son_silence
+tais-toi,son_silence
+désactive le haut-parleur,son_silence
+arrête le bruit,son_silence
+plus de son,son_silence
+mute,son_silence
+mets le volume à fond,volume_max
+volume maximum,volume_max
+augmente le son au max,volume_max
+son très fort,volume_max
+mets le son fort,volume_max
+volume 100%,volume_max
+crie,volume_max
+booste le son,volume_max
+tout le volume,volume_max
+son au max,volume_max
+volume moyen,volume_moyen
+son modéré,volume_moyen
+mets le son à moitié,volume_moyen
+volume à 50%,volume_moyen
+baisse un peu le son,volume_moyen
+mets un volume normal,volume_moyen
+son équilibré,volume_moyen
+pas trop fort,volume_moyen
+ni trop ni trop peu,volume_moyen
+volume standard,volume_moyen
+mets le son bas,volume_bas
+volume minimum,volume_bas
+réduis le son,volume_bas
+mets le son doucement,volume_bas
+volume faible,volume_bas
+chuchote,volume_bas
+baisse le volume,volume_bas
+mets très peu de son,volume_bas
+volume au minimum,volume_bas
+ne fais pas de bruit,volume_bas
+joue un do,note_do
+note do,note_do
+fais la note do,note_do
+produis un do,note_do
+do,note_do
+mets un son do,note_do
+joue la note do,note_do
+entends un do,note_do
+joue un do aigu,note_do
+fais un do musical,note_do
+joue un ré,note_re
+note ré,note_re
+fais la note ré,note_re
+produis un ré,note_re
+ré,note_re
+mets un son ré,note_re
+joue la note ré,note_re
+entends un ré,note_re
+ré musical,note_re
+joue un ré aigu,note_re
+joue un mi,note_mi
+note mi,note_mi
+fais la note mi,note_mi
+produis un mi,note_mi
+mi,note_mi
+mets un son mi,note_mi
+joue la note mi,note_mi
+entends un mi,note_mi
+mi musical,note_mi
+joue un mi aigu,note_mi
+joue un fa,note_fa
+note fa,note_fa
+fais la note fa,note_fa
+produis un fa,note_fa
+fa,note_fa
+mets un son fa,note_fa
+joue la note fa,note_fa
+entends un fa,note_fa
+fa musical,note_fa
+joue un fa aigu,note_fa
+joue un sol,note_sol
+note sol,note_sol
+fais la note sol,note_sol
+produis un sol,note_sol
+sol,note_sol
+mets un son sol,note_sol
+joue la note sol,note_sol
+entends un sol,note_sol
+sol musical,note_sol
+joue un sol aigu,note_sol
+joue un la,note_la
+note la,note_la
+fais la note la,note_la
+produis un la,note_la
+la,note_la
+mets un son la,note_la
+joue la note la,note_la
+entends un la,note_la
+la musical,note_la
+joue un la aigu,note_la
+joue un si,note_si
+note si,note_si
+fais la note si,note_si
+produis un si,note_si
+si,note_si
+mets un son si,note_si
+joue la note si,note_si
+entends un si,note_si
+si musical,note_si
+joue un si aigu,note_si
+fais demi-tour à gauche,demi_tour_gauche
+retourne à gauche,demi_tour_gauche
+180 à gauche,demi_tour_gauche
+tourne complètement à gauche,demi_tour_gauche
+tourne sur toi-même à gauche,demi_tour_gauche
+revire à gauche,demi_tour_gauche
+fais un demi-tour gauche,demi_tour_gauche
+rotation gauche complète,demi_tour_gauche
+tourne en arrière vers la gauche,demi_tour_gauche
+pivot 180 gauche,demi_tour_gauche
+fais demi-tour à droite,demi_tour_droite
+retourne à droite,demi_tour_droite
+180 à droite,demi_tour_droite
+tourne complètement à droite,demi_tour_droite
+tourne sur toi-même à droite,demi_tour_droite
+revire à droite,demi_tour_droite
+fais un demi-tour droite,demi_tour_droite
+rotation droite complète,demi_tour_droite
+tourne en arrière vers la droite,demi_tour_droite
+pivot 180 droite,demi_tour_droite
+arrêt d’urgence,arret_urgence
+stop maintenant,arret_urgence
+arrête tout,arret_urgence
+urgence stop,arret_urgence
+stoppe immédiatement,arret_urgence
+coupe tout,arret_urgence
+situation d’urgence,arret_urgence
+arrêt immédiat,arret_urgence
+"danger, stop",arret_urgence
+stop urgence,arret_urgence
+comment tu vas ?,none
+c’est quoi ton nom ?,none
+qui es-tu ?,none
+raconte-moi une blague,none
+donne la météo,none
+ouvre la porte,none
+envoie un message,none
+quelle heure est-il ?,none
+je suis fatigué,none
+tu connais la musique de star wars ?,none
