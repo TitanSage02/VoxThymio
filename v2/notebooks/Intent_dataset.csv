@@ -153,8 +153,8 @@ Mouvement rocket speed,avancer_rapide
 Continue comme une comète,avancer_rapide
 Avance tel un missile,avancer_rapide
 Il faut exploser les compteurs,avancer_rapide
-Recule toi,reculer  
-Va en arrière,reculer
+Recule toi,reculer
+reculer   Va en arrière,reculer
 Il faut reculer,reculer
 Mouvement vers l'arrière,reculer
 Déplace toi vers l'arrière,reculer
@@ -206,6 +206,46 @@ Il faut continuer derrière,reculer
 Déplace toi lentement derrière,reculer
 Mouvement lent vers l'arrière,reculer
 Régresse très doucement,reculer
+Fais marche arrière,reculer
+Retourne en arrière,reculer
+Effectue un recul,reculer
+Déplace toi à reculons,reculer
+Fait un pas en arrière,reculer
+Tire toi vers l'arrière,reculer
+Opère un mouvement de recul,reculer
+Procède à un retrait,reculer
+Exécute un recul,reculer
+Accomplis un mouvement arrière,reculer
+Réalise un déplacement vers l'arrière,reculer
+Effectue une marche arrière,reculer
+Entreprends un recul,reculer
+Mets toi en marche arrière,reculer
+Amorce un recul,reculer
+Initie un mouvement de retrait,reculer
+Lance toi en arrière,reculer
+Démarre un recul,reculer
+Engage un mouvement arrière,reculer
+Enclenche la marche arrière,reculer
+Active le mode recul,reculer
+Passe en marche arrière,reculer
+Bascule en mode recul,reculer
+Oriente toi vers l'arrière,reculer
+Dirige toi en arrière,reculer
+File vers l'arrière,reculer
+Glisse vers l'arrière,reculer
+Roule en arrière,reculer
+Avance à reculons,reculer
+Progresse vers l'arrière,reculer
+Évolue en arrière,reculer
+Navigue vers l'arrière,reculer
+Circule en marche arrière,reculer
+Manœuvre en arrière,reculer
+Opère en marche arrière,reculer
+Fonctionne en mode recul,reculer
+Travaille en marche arrière,reculer
+Agis en reculant,reculer
+Procède par recul,reculer
+Avance par l'arrière,reculer
 Recule très lentement,reculer_lent
 Va doucement en arrière,reculer_lent
 Déplace toi lentement vers l'arrière,reculer_lent
