@@ -5,6 +5,9 @@
 
 ![VoxThymio](https://img.shields.io/badge/VoxThymio-v2.0-00d4aa?style=for-the-badge&logo=robot)
 ![AI4Innov](https://img.shields.io/badge/AI4Innov-Innovation-00d4aa?style=for-the-badge)
+![Python](https://img.shields.io/badge/Python-≥3.8-blue?style=for-the-badge&logo=python)
+![Whisper](https://img.shields.io/badge/Speech--to--Text-Whisper-informational?style=for-the-badge)
+![BERT](https://img.shields.io/badge/NLP-BERT-yellow?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 ## 📋 Sommaire
@@ -232,7 +235,3 @@ Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 ## 👤 Développeur
 
 **VoxThymio** a été développé par **Espérance AYIWAHOUN** pour **AI4Innov**.
-
----
-
-** VoxThymio **

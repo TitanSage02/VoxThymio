@@ -1,0 +1,45 @@
+# Requirements pour VoxThymio GUI - Interface graphique complète
+# Fichier de configuration conforme au cahier des charges
+
+# === DÉPENDANCES DE BASE ===
+# Contrôle de Thymio avec Python
+tdmclient>=0.1.0 
+
+# Reconnaissance vocale
+SpeechRecognition>=3.10.0
+openai-whisper>=20230314
+
+# Support audio pour le microphone
+pyaudio>=0.2.11
+
+# Classification d'intention (BERT)
+transformers>=4.0.0
+torch>=1.10.0
+joblib>=1.0.0
+
+# === DÉPENDANCES INTERFACE GRAPHIQUE ===
+# Interface graphique moderne
+# tkinter est inclus avec Python par défaut
+
+# Support des images et icônes (pour l'interface graphique)
+Pillow>=9.0.0
+
+# Polices et thèmes (optionnel)
+# ttkthemes>=3.2.0  # Décommentez pour des thèmes avancés
+
+# === DÉPENDANCES OPTIONNELLES ===
+# Animation et GIF (pour les effets visuels)
+# imageio>=2.25.0  # Décommentez pour les GIF animés
+# matplotlib>=3.5.0  # Décommentez pour les graphiques
+
+# === NOTES D'INSTALLATION ===
+# Sur Windows :
+# pip install -r requirements_gui.txt
+#
+# Sur Ubuntu/Debian :
+# sudo apt-get install python3-tk
+# pip install -r requirements_gui.txt
+#
+# Sur macOS :
+# brew install python-tk
+# pip install -r requirements_gui.txt
