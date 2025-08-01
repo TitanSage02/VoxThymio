@@ -1,7 +1,7 @@
 # 🤖 VoxThymio – Contrôle intelligent du robot Thymio
 
 > **Système avancé de contrôle vocal et manuel pour robot Thymio**  
-> Développé par **AI4Innov**
+> Développé par **Espérance AYIWAHOUN** pour **AI4Innov**
 
 ![VoxThymio](https://img.shields.io/badge/VoxThymio-v2.0-00d4aa?style=for-the-badge&logo=robot)
 ![AI4Innov](https://img.shields.io/badge/AI4Innov-Innovation-00d4aa?style=for-the-badge)
@@ -56,7 +56,7 @@ Cette version exploite un modèle BERT de classification d'intention pour interp
 ## 🖥️ Configuration requise
 
 - **Python** ≥ 3.8
-- **Thymio Suite** (installé et en cours d'exécution)
+- **Thymio** (connecté ou emulé avec Thymio Suite)
 - **Microphone** (intégré ou externe)
 - **Hardware recommandé** :
   - CPU : Core i3 ou équivalent
