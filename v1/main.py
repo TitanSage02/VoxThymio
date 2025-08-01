@@ -59,7 +59,6 @@ class ThymioVoiceInterface:
                 command = self.voice_controller.listen_for_command()
                 
                 if command.status == VoiceCommandStatus.SUCCESS:
-                    print(f"✅ COMMANDE RECONNUE: '{command.text}'")
                     
                     if command.command_key == "quitter":
                         print("👋 Arrêt demandé")
@@ -154,10 +153,10 @@ class ThymioVoiceInterface:
                             cmd = commands[choice]
                             print(f"🤖 Exécution: {cmd}")
                             result = await self.controller.execute_command(cmd)
-                            if result:
-                                print(f"✅ '{cmd}' exécutée avec succès !")
-                            else:
-                                print(f"❌ Échec de '{cmd}'")
+                            # if result:
+                            #     print(f"✅ '{cmd}' exécutée avec succès !")
+                            # else:
+                            #     print(f"❌ Échec de '{cmd}'")
                             input("Appuyez sur Entrée...")
                         
                         else:
