@@ -10,5 +10,8 @@ pyaudio>=0.2.11
 # Packaging en exécutable
 pyinstaller>=5.0.0
 
-# JSON et outils de traitement
-json5>=1.0.0
+
+# Classification d'intention (BERT)
+transformers>=4.0.0
+torch>=1.10.0
+joblib>=1.0.0
