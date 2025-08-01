@@ -28,7 +28,6 @@ class ThymioController:
             
             with open(commands_path, 'r', encoding='utf-8') as f:
                 commands = json.load(f)
-                print(f"✅ {len(commands)} commandes chargées depuis {commands_path}")
                 return commands
         
         except Exception as e:
