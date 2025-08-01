@@ -41,7 +41,10 @@ class SplashScreen:
         self.splash.attributes('-topmost', True)
         
         try:
-            self.splash.iconbitmap("robot.ico")
+            # Chemin absolu vers l'icône
+            icon_path = Path(__file__).parent / "robot.ico"
+            if icon_path.exists():
+                self.splash.iconbitmap(str(icon_path))
         except:
             pass
     
@@ -74,7 +77,7 @@ class SplashScreen:
         
         # Progress bar
         progress_frame = tk.Frame(main_frame, bg="#1e1e1e")
-        progress_frame.pack(pady=20, fill="x")
+        progress_frame.pack(pady=10, fill="x")
         
         self.progress = ttk.Progressbar(progress_frame, 
                                        variable=self.progress_var,
@@ -142,12 +145,22 @@ def show_splash_and_load():
         
         # Importer et lancer l'application principale
         try:
+            # Ajout du chemin parent pour l'import
+            import sys
+            from pathlib import Path
+            parent_dir = Path(__file__).parent.parent
+            if str(parent_dir) not in sys.path:
+                sys.path.insert(0, str(parent_dir))
+            
             from gui.voxthymio_gui import VoxThymioGUI
             app = VoxThymioGUI()
             app.run()
         except ImportError as e:
             import tkinter.messagebox as msgbox
-            msgbox.showerror("Erreur", f"Erreur d'importation: {e}")
+            msgbox.showerror("Erreur d'importation", 
+                           f"Impossible de charger l'interface principale.\n"
+                           f"Erreur: {e}\n\n"
+                           f"Vérifiez que tous les fichiers sont présents.")
     
     # Lancer le chargement en arrière-plan
     threading.Thread(target=load_app, daemon=True).start()

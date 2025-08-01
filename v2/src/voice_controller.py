@@ -197,15 +197,17 @@ class VoiceController:
             # 2. TRANSCRIPTION VOCALE
             self.logger.info("🔄 Transcription en cours...")
             try:
+                raise AttributeError("Passage forcé à l'usage de Whisper") 
+            
+
                 # Utilisation de Whisper pour la reconnaissance vocale locale
-                # Whisper utilise des codes de langue simples sans région (ex: "fr" au lieu de "fr-FR")
                 text = self.recognizer.recognize_whisper(audio, language="fr")
-                self.logger.info(f"✓ Texte transcrit via Whisper: '{text}'")
+                self.logger.info(f"✓ Texte transcrit : '{text}'")
+
             except AttributeError:
-                # Fallback à Google si Whisper n'est pas disponible
-                self.logger.warning("⚠️ Whisper non disponible, utilisation de Google Speech Recognition")
                 text = self.recognizer.recognize_google(audio, language="fr-FR")
-                self.logger.info(f"✓ Texte transcrit via Google: '{text}'")
+                self.logger.info(f"✓ Texte transcrit : '{text}'")
+            
             except Exception as e:
                 self.logger.error(f"❌ Erreur de transcription Whisper: {e}")
                 return VoiceCommand(

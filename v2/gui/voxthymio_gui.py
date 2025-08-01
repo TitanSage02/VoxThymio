@@ -16,10 +16,17 @@ import time
 from datetime import datetime
 
 # Ajout du chemin racine
-sys.path.append(str(Path(__file__).parent))
+parent_dir = Path(__file__).parent.parent
+if str(parent_dir) not in sys.path:
+    sys.path.insert(0, str(parent_dir))
 
-from src.communication.thymio_controller import ThymioController
-from src.voice_controller import VoiceController, VoiceCommandStatus
+try:
+    from src.communication.thymio_controller import ThymioController
+    from src.voice_controller import VoiceController, VoiceCommandStatus
+except ImportError as e:
+    print(f"❌ Erreur d'importation: {e}")
+    print("Vérifiez que les modules src/ sont présents")
+    raise
 
 MODEL_PATH = Path(__file__).parent.parent / "models"
 
@@ -45,15 +52,16 @@ class VoxThymioGUI:
         self.root.configure(bg="#1e1e1e")
         self.root.resizable(True, True)
         
-        # Style moderne
+        # Style moderne et optimisé
         style = ttk.Style()
         style.theme_use('clam')
         
-        # Configuration des couleurs
+        # Configuration des couleurs améliorées
         style.configure('Title.TLabel', 
                        background="#1e1e1e", 
                        foreground="#00d4aa", 
-                       font=("Segoe UI", 20, "bold"))
+                       font=("Segoe UI", 20, "bold"),
+                       relief="flat")
         
         style.configure('Header.TLabel', 
                        background="#1e1e1e", 
@@ -65,24 +73,63 @@ class VoxThymioGUI:
                        foreground="#ffd700", 
                        font=("Segoe UI", 10))
         
+        # Boutons avec gradients visuels améliorés
         style.configure('Modern.TButton', 
                        background="#00d4aa", 
                        foreground="white", 
                        font=("Segoe UI", 10, "bold"),
-                       relief="flat")
+                       relief="flat",
+                       borderwidth=0,
+                       focuscolor="none")
         
         style.map('Modern.TButton',
-                 background=[('active', '#00b894')])
+                 background=[('active', '#00b894'), ('pressed', '#009d7f')])
         
         style.configure('Voice.TButton', 
                        background="#e74c3c", 
                        foreground="white", 
                        font=("Segoe UI", 12, "bold"),
-                       relief="flat")
+                       relief="flat",
+                       borderwidth=0,
+                       focuscolor="none")
+                       
+        style.map('Voice.TButton',
+                 background=[('active', '#c0392b'), ('pressed', '#a93226')])
+        
+        # Nouveau style pour boutons de connexion
+        style.configure('Connect.TButton', 
+                       background="#3498db", 
+                       foreground="white", 
+                       font=("Segoe UI", 10, "bold"),
+                       relief="flat",
+                       borderwidth=0,
+                       focuscolor="none")
+                       
+        style.map('Connect.TButton',
+                 background=[('active', '#2980b9'), ('pressed', '#1f618d')])
+        
+        # Style pour boutons désactivés
+        style.configure('Disabled.TButton', 
+                       background="#555555", 
+                       foreground="#888888", 
+                       font=("Segoe UI", 10),
+                       relief="flat",
+                       borderwidth=0)
+        
+        # Style pour la barre de progression
+        style.configure('Modern.Horizontal.TProgressbar',
+                       background="#00d4aa",
+                       troughcolor="#2d2d2d",
+                       borderwidth=0,
+                       lightcolor="#00d4aa",
+                       darkcolor="#00d4aa")
         
         # Icône
         try:
-            self.root.iconbitmap(default="robot.ico")
+            # Chemin absolu vers l'icône
+            icon_path = Path(__file__).parent / "robot.ico"
+            if icon_path.exists():
+                self.root.iconbitmap(str(icon_path))
         except:
             pass
     
@@ -157,22 +204,22 @@ class VoxThymioGUI:
                                          style="Status.TLabel")
         self.connection_status.pack(pady=5)
         
-        # Boutons de connexion
+        # Boutons de connexion améliorés
         btn_frame = tk.Frame(frame, bg="#2d2d2d")
-        btn_frame.pack(pady=5)
+        btn_frame.pack(pady=10)
         
         self.connect_btn = ttk.Button(btn_frame, 
-                                     text="Se connecter",
-                                     style="Modern.TButton",
+                                     text="🔌 Se connecter",
+                                     style="Connect.TButton",
                                      command=self.connect_robot)
-        self.connect_btn.pack(side="left", padx=5)
+        self.connect_btn.pack(side="left", padx=5, ipadx=10, ipady=5)
         
         self.disconnect_btn = ttk.Button(btn_frame, 
-                                        text="Déconnecter",
-                                        style="Modern.TButton",
+                                        text="🔌 Déconnecter",
+                                        style="Disabled.TButton",
                                         command=self.disconnect_robot,
                                         state="disabled")
-        self.disconnect_btn.pack(side="left", padx=5)
+        self.disconnect_btn.pack(side="left", padx=5, ipadx=10, ipady=5)
     
     def create_control_panel(self, parent):
         """Panneau de contrôle manuel."""
@@ -186,56 +233,75 @@ class VoxThymioGUI:
                                       bg="#2d2d2d", fg="white")
         movement_frame.pack(fill="x", padx=10, pady=5)
         
-        # Grille de boutons de mouvement
+        # Grille de boutons de mouvement optimisée
         btn_grid = tk.Frame(movement_frame, bg="#2d2d2d")
-        btn_grid.pack(pady=5)
+        btn_grid.pack(pady=10)
+        
+        # Configuration des colonnes pour un alignement parfait
+        btn_grid.columnconfigure(0, weight=1)
+        btn_grid.columnconfigure(1, weight=1)
+        btn_grid.columnconfigure(2, weight=1)
         
         # Ligne 1: Avancer
         ttk.Button(btn_grid, text="⬆️ Avancer", 
                   command=lambda: self.manual_command("avancer"),
-                  style="Modern.TButton").grid(row=0, column=1, padx=2, pady=2)
+                  style="Modern.TButton").grid(row=0, column=1, padx=3, pady=3, 
+                                              sticky="ew", ipadx=5, ipady=3)
         
         # Ligne 2: Gauche, Stop, Droite
         ttk.Button(btn_grid, text="⬅️ Gauche", 
                   command=lambda: self.manual_command("tourner_gauche"),
-                  style="Modern.TButton").grid(row=1, column=0, padx=2, pady=2)
+                  style="Modern.TButton").grid(row=1, column=0, padx=3, pady=3, 
+                                              sticky="ew", ipadx=5, ipady=3)
         
         ttk.Button(btn_grid, text="⏹️ STOP", 
                   command=lambda: self.manual_command("arreter"),
-                  style="Voice.TButton").grid(row=1, column=1, padx=2, pady=2)
+                  style="Voice.TButton").grid(row=1, column=1, padx=3, pady=3, 
+                                             sticky="ew", ipadx=5, ipady=3)
         
         ttk.Button(btn_grid, text="➡️ Droite", 
                   command=lambda: self.manual_command("tourner_droite"),
-                  style="Modern.TButton").grid(row=1, column=2, padx=2, pady=2)
+                  style="Modern.TButton").grid(row=1, column=2, padx=3, pady=3, 
+                                              sticky="ew", ipadx=5, ipady=3)
         
         # Ligne 3: Reculer
         ttk.Button(btn_grid, text="⬇️ Reculer", 
                   command=lambda: self.manual_command("reculer"),
-                  style="Modern.TButton").grid(row=2, column=1, padx=2, pady=2)
+                  style="Modern.TButton").grid(row=2, column=1, padx=3, pady=3, 
+                                              sticky="ew", ipadx=5, ipady=3)
         
-        # Boutons LED
-        led_frame = tk.LabelFrame(frame, text="LEDs", 
-                                 bg="#2d2d2d", fg="white")
-        led_frame.pack(fill="x", padx=10, pady=5)
+        # Boutons LED optimisés avec grille responsive
+        led_frame = tk.LabelFrame(frame, text="💡 LEDs", 
+                                 bg="#2d2d2d", fg="white",
+                                 font=("Segoe UI", 9, "bold"))
+        led_frame.pack(fill="x", padx=10, pady=10)
         
         led_grid = tk.Frame(led_frame, bg="#2d2d2d")
-        led_grid.pack(pady=5)
+        led_grid.pack(pady=8)
+        
+        # Configuration des colonnes pour un alignement parfait
+        for i in range(4):
+            led_grid.columnconfigure(i, weight=1)
         
         ttk.Button(led_grid, text="🔴 Rouge", 
                   command=lambda: self.manual_command("led_rouge"),
-                  style="Modern.TButton").grid(row=0, column=0, padx=2, pady=2)
+                  style="Modern.TButton").grid(row=0, column=0, padx=3, pady=3, 
+                                              sticky="ew", ipadx=3, ipady=2)
         
         ttk.Button(led_grid, text="🟢 Vert", 
                   command=lambda: self.manual_command("led_vert"),
-                  style="Modern.TButton").grid(row=0, column=1, padx=2, pady=2)
+                  style="Modern.TButton").grid(row=0, column=1, padx=3, pady=3, 
+                                              sticky="ew", ipadx=3, ipady=2)
         
         ttk.Button(led_grid, text="🔵 Bleu", 
                   command=lambda: self.manual_command("led_bleu"),
-                  style="Modern.TButton").grid(row=0, column=2, padx=2, pady=2)
+                  style="Modern.TButton").grid(row=0, column=2, padx=3, pady=3, 
+                                              sticky="ew", ipadx=3, ipady=2)
         
         ttk.Button(led_grid, text="⚫ Éteindre", 
                   command=lambda: self.manual_command("led_eteindre"),
-                  style="Modern.TButton").grid(row=0, column=3, padx=2, pady=2)
+                  style="Modern.TButton").grid(row=0, column=3, padx=3, pady=3, 
+                                              sticky="ew", ipadx=3, ipady=2)
     
     def create_voice_panel(self, parent):
         """Panneau de contrôle vocal."""
@@ -250,35 +316,40 @@ class VoxThymioGUI:
                                    style="Status.TLabel")
         self.mic_status.pack(pady=5)
         
-        # Bouton vocal principal
+        # Bouton vocal principal avec style amélioré
         self.voice_btn = ttk.Button(frame, 
                                    text="🎤 ACTIVER LE CONTRÔLE VOCAL",
                                    style="Voice.TButton",
                                    command=self.toggle_voice_mode)
-        self.voice_btn.pack(pady=10, padx=20, fill="x")
+        self.voice_btn.pack(pady=15, padx=20, fill="x", ipady=8)
         
-        # Zone de commandes vocales
-        commands_frame = tk.LabelFrame(frame, text="Commandes Disponibles", 
-                                      bg="#2d2d2d", fg="white")
-        commands_frame.pack(fill="x", padx=10, pady=5)
+        # Zone de commandes vocales avec style amélioré
+        commands_frame = tk.LabelFrame(frame, text="📋 Commandes Disponibles", 
+                                      bg="#2d2d2d", fg="white",
+                                      font=("Segoe UI", 9, "bold"))
+        commands_frame.pack(fill="x", padx=10, pady=10)
         
-        commands_text = """
-                🎯 MOUVEMENT: "avancer", "reculer", "gauche", "droite", "stop"
-                💡 LEDs: "rouge", "vert", "bleu", "éteindre"
-                🔧 SYSTÈME: "quitter"
-                """.strip()
+        # Amélioration du texte des commandes avec meilleure lisibilité
+        commands_text = """🎯 MOUVEMENT: "avancer", "reculer", "gauche", "droite", "stop"
+💡 LEDs: "rouge", "vert", "bleu", "éteindre"  
+🔧 SYSTÈME: "quitter" """
         
         commands_label = tk.Label(commands_frame, text=commands_text, 
                                  bg="#2d2d2d", fg="#00d4aa", 
-                                 font=("Consolas", 9), justify="left")
-        commands_label.pack(padx=10, pady=5)
+                                 font=("Consolas", 9), justify="left",
+                                 anchor="w")
+        commands_label.pack(padx=15, pady=8, fill="x")
         
-        # Indicateur vocal
-        self.voice_indicator = tk.Label(frame, 
+        # Indicateur vocal avec frame dédié pour meilleur contrôle visuel
+        indicator_frame = tk.Frame(frame, bg="#2d2d2d", relief="solid", bd=1)
+        indicator_frame.pack(fill="x", padx=20, pady=10)
+        
+        self.voice_indicator = tk.Label(indicator_frame, 
                                        text="🔇 Mode vocal inactif", 
                                        bg="#2d2d2d", fg="#888888",
-                                       font=("Segoe UI", 10, "bold"))
-        self.voice_indicator.pack(pady=5)
+                                       font=("Segoe UI", 10, "bold"),
+                                       pady=8)
+        self.voice_indicator.pack(fill="x")
     
     def create_log_panel(self, parent):
         """Panneau de logs."""
@@ -287,38 +358,56 @@ class VoxThymioGUI:
                              font=("Segoe UI", 10, "bold"))
         frame.pack(fill="both", expand=True)
         
-        # Zone de texte avec scroll
-        self.log_text = scrolledtext.ScrolledText(frame, 
+        # Zone de texte avec scroll améliorée
+        log_container = tk.Frame(frame, bg="#2d2d2d", relief="sunken", bd=1)
+        log_container.pack(fill="both", expand=True, padx=10, pady=5)
+        
+        self.log_text = scrolledtext.ScrolledText(log_container, 
                                                  height=15, 
-                                                 bg="#1a1a1a", 
+                                                 bg="#0d1117", 
                                                  fg="#00d4aa",
                                                  font=("Consolas", 9),
-                                                 state="disabled")
-        self.log_text.pack(fill="both", expand=True, padx=10, pady=5)
+                                                 state="disabled",
+                                                 relief="flat",
+                                                 selectbackground="#264f78",
+                                                 selectforeground="#ffffff",
+                                                 insertbackground="#00d4aa",
+                                                 wrap="word")
+        self.log_text.pack(fill="both", expand=True, padx=2, pady=2)
         
-        # Bouton de nettoyage
-        ttk.Button(frame, text="🗑️ Effacer les logs", 
+        # Bouton de nettoyage avec style amélioré
+        clear_frame = tk.Frame(frame, bg="#2d2d2d")
+        clear_frame.pack(fill="x", padx=10, pady=5)
+        
+        ttk.Button(clear_frame, text="🗑️ Effacer les logs", 
                   command=self.clear_logs,
-                  style="Modern.TButton").pack(pady=5)
+                  style="Modern.TButton").pack(pady=3, ipadx=10)
     
     def create_footer(self, parent):
         """Pied de page avec informations."""
         footer_frame = tk.Frame(parent, bg="#1e1e1e")
         footer_frame.pack(fill="x", pady=(20, 0))
         
-        # Ligne de séparation
-        separator = tk.Frame(footer_frame, height=1, bg="#00d4aa")
-        separator.pack(fill="x", pady=(0, 10))
+        # Ligne de séparation avec gradient visuel
+        separator_frame = tk.Frame(footer_frame, bg="#1e1e1e", height=3)
+        separator_frame.pack(fill="x", pady=(0, 15))
         
-        # Informations
+        separator1 = tk.Frame(separator_frame, height=1, bg="#00d4aa")
+        separator1.pack(fill="x")
+        
+        separator2 = tk.Frame(separator_frame, height=1, bg="#004d3f")
+        separator2.pack(fill="x", pady=(1, 0))
+        
+        # Informations avec style amélioré
         info_frame = tk.Frame(footer_frame, bg="#1e1e1e")
         info_frame.pack(fill="x")
         
         copyright_label = ttk.Label(info_frame, 
-                                   text="© 2025 AI4Innov - VoxThymio v1.0",
+                                   text="© 2025 AI4Innov - VoxThymio v2.0",
                                    style="Status.TLabel")
         copyright_label.pack(side="left")
         
+        # Horloge avec style amélioré
         self.time_label = ttk.Label(info_frame, 
                                    text=self.get_current_time(),
                                    style="Status.TLabel")
@@ -394,25 +483,58 @@ class VoxThymioGUI:
         threading.Thread(target=connect_async, daemon=True).start()
     
     def on_connection_success(self):
-        """Callback de connexion réussie."""
+        """Callback de connexion réussie avec animations visuelles."""
         self.log_message("✅ Robot Thymio connecté avec succès !", "SUCCESS")
         self.connection_status.config(text="✅ Connecté", foreground="#00ff88")
-        self.connect_btn.config(state="disabled", text="Connecté")
-        self.disconnect_btn.config(state="normal")
+        self.connect_btn.config(state="disabled", text="✅ Connecté", style="Disabled.TButton")
+        self.disconnect_btn.config(state="normal", style="Connect.TButton")
+        
+        # Animation visuelle de succès
+        self.animate_connection_success()
         
         # Initialiser le contrôleur vocal
         self.init_voice_controller()
     
+    def animate_connection_success(self):
+        """Animation visuelle pour indiquer la connexion réussie."""
+        original_bg = self.connection_status.cget("foreground")
+        colors = ["#00ff88", "#00d4aa", "#00ff88", "#00d4aa", "#00ff88"]
+        
+        def animate_step(step=0):
+            if step < len(colors):
+                self.connection_status.config(foreground=colors[step])
+                self.root.after(200, lambda: animate_step(step + 1))
+            else:
+                self.connection_status.config(foreground="#00ff88")
+        
+        animate_step()
+    
     def on_connection_failed(self):
-        """Callback de connexion échouée."""
+        """Callback de connexion échouée avec indicateurs visuels améliorés."""
         self.log_message("❌ Échec de connexion au robot", "ERROR")
         self.log_message("   Vérifiez que Thymio Suite est lancé", "WARNING")
         self.connection_status.config(text="❌ Échec de connexion", foreground="#e74c3c")
-        self.connect_btn.config(state="normal", text="Réessayer")
+        self.connect_btn.config(state="normal", text="🔄 Réessayer", style="Connect.TButton")
+        
+        # Animation visuelle d'erreur
+        self.animate_connection_error()
         
         messagebox.showerror("Erreur de connexion", 
                            "Impossible de se connecter au robot Thymio.\n"
                            "Vérifiez que Thymio Suite est lancé et le robot connecté.")
+    
+    def animate_connection_error(self):
+        """Animation visuelle pour indiquer l'erreur de connexion."""
+        colors = ["#e74c3c", "#c0392b", "#e74c3c", "#c0392b", "#e74c3c"]
+        
+        def animate_step(step=0):
+            if step < len(colors):
+                self.connection_status.config(foreground=colors[step])
+                self.root.after(150, lambda: animate_step(step + 1))
+            else:
+                self.connection_status.config(foreground="#e74c3c")
+        
+        animate_step()
     
     def init_voice_controller(self):
         """Initialise le contrôleur vocal."""
@@ -459,12 +581,12 @@ class VoxThymioGUI:
         threading.Thread(target=disconnect_async, daemon=True).start()
     
     def on_disconnection_complete(self):
-        """Callback de déconnexion terminée."""
+        """Callback de déconnexion terminée avec indicateurs visuels."""
         self.log_message("👋 Robot déconnecté", "INFO")
         self.connection_status.config(text="❌ Non connecté", foreground="#888888")
-        self.connect_btn.config(state="normal", text="Se connecter")
-        self.disconnect_btn.config(state="disabled")
-        self.voice_btn.config(state="disabled")
+        self.connect_btn.config(state="normal", text="🔌 Se connecter", style="Connect.TButton")
+        self.disconnect_btn.config(state="disabled", style="Disabled.TButton")
+        self.voice_btn.config(state="disabled", style="Disabled.TButton")
         self.mic_status.config(text="🎤 Microphone: En attente...", 
                              foreground="#888888")
     
@@ -603,28 +725,39 @@ class VoxThymioGUI:
     
     def on_closing(self):
         """Gestion de la fermeture de l'application."""
-        if self.voice_mode:
-            self.stop_voice_mode()
-        
-        if self.controller and self.controller.is_connected():
-            self.log_message("🔌 Déconnexion en cours...", "INFO")
+        try:
+            if self.voice_mode:
+                self.log_message("🔇 Arrêt du mode vocal...", "INFO")
+                self.stop_voice_mode()
             
-            def final_disconnect():
-                async def do_disconnect():
-                    await self.controller.disconnect()
+            if self.controller and self.controller.is_connected():
+                self.log_message("🔌 Déconnexion en cours...", "INFO")
                 
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                loop.run_until_complete(do_disconnect())
-                loop.close()
+                def final_disconnect():
+                    try:
+                        async def do_disconnect():
+                            await self.controller.disconnect()
+                        
+                        loop = asyncio.new_event_loop()
+                        asyncio.set_event_loop(loop)
+                        loop.run_until_complete(do_disconnect())
+                        loop.close()
+                        
+                    except Exception as e:
+                        print(f"Erreur lors de la déconnexion: {e}")
+                    finally:
+                        # Fermer l'application dans tous les cas
+                        self.root.after(0, self.root.quit)
                 
+                threading.Thread(target=final_disconnect, daemon=True).start()
+                
+                # Timeout de sécurité réduit
+                self.root.after(1500, self.root.quit)
+            else:
                 self.root.quit()
-            
-            threading.Thread(target=final_disconnect, daemon=True).start()
-            
-            # Attendre un peu puis fermer
-            self.root.after(2000, self.root.quit)
-        else:
+                
+        except Exception as e:
+            print(f"Erreur lors de la fermeture: {e}")
             self.root.quit()
     
     def run(self):
@@ -639,10 +772,34 @@ class VoxThymioGUI:
 def main():
     """Point d'entrée principal."""
     try:
+        # Vérification des dépendances critiques
+        try:
+            import speech_recognition
+            import transformers
+            import torch
+        except ImportError as e:
+            messagebox.showerror("Dépendances manquantes", 
+                               f"Modules requis non installés: {e}\n\n"
+                               "Installez les dépendances avec:\n"
+                               "pip install -r requirements_gui.txt")
+            return
+        
+        # Vérification du modèle IA
+        model_path = Path(__file__).parent.parent / "models"
+        if not model_path.exists() or not list(model_path.glob("*.safetensors")):
+            messagebox.showwarning("Modèle IA manquant", 
+                                 f"Le modèle d'IA n'est pas trouvé dans:\n{model_path}\n\n"
+                                 "L'application démarrera mais le contrôle vocal pourrait ne pas fonctionner.")
+        
         app = VoxThymioGUI()
         app.run()
+        
     except Exception as e:
-        messagebox.showerror("Erreur fatale", f"Erreur critique: {e}")
+        import logging
+        logging.exception("Erreur fatale")
+        messagebox.showerror("Erreur fatale", 
+                           f"Erreur critique lors du démarrage:\n{e}\n\n"
+                           "Consultez les logs pour plus de détails.")
 
 
 if __name__ == "__main__":
