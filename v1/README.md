@@ -1,4 +1,4 @@
-# 🤖 VoxThymio - Contrôle Vocal Intelligent
+# 🤖 VoxThymio v1 – Contrôle Vocal Intelligent pour Thymio
 
 > **Système de contrôle vocal pour robot Thymio**  
 > Développé par **Espérance AYIWAHOUN** pour **AI4Innov**
@@ -9,119 +9,117 @@
 
 ---
 
-## ✨ Aperçu
+## ✨ Présentation
 
-**VoxThymio** révolutionne l'interaction avec le robot Thymio grâce à une interface vocale naturelle et intuitive. Plus besoin de programmation complexe : parlez simplement à votre robot !
+**VoxThymio v1** révolutionne l’interaction avec le robot Thymio grâce à une interface vocale naturelle et intuitive. Plus besoin de programmation complexe : parlez simplement à votre robot !
 
-### 🎯 Fonctionnalités Principales
+### 🎯 Fonctionnalités principales
 
-- 🎤 **Contrôle vocal en français** - Commandes naturelles et intuitives
-- 🎮 **Interface graphique moderne** - Design professionnel avec branding AI4Innov  
-- 🔌 **Connexion simplifiée** - Détection automatique du robot Thymio
-- 📊 **Journal d'activité** - Suivi en temps réel des actions
-- 🛡️ **Robustesse** - Gestion d'erreurs et récupération automatique
+- 🎤 **Contrôle vocal en français** – Commandes naturelles et intuitives
+- 🖥️ **Interface graphique moderne** – Design professionnel avec branding AI4Innov
+- 🔌 **Connexion simplifiée** – Détection automatique du robot Thymio
+- 📈 **Journal d’activité** – Suivi en temps réel des actions
+- 🛡️ **Robustesse** – Gestion d’erreurs et récupération automatique
 
 ---
 
-## 🚀 Installation Rapide
+## 🚀 Installation
 
-### Option 1: Exécutable (Recommandé)
-1. **Téléchargez** `VoxThymio.exe` depuis `dist/VoxThymio.exe`
-2. **Double-cliquez** pour lancer (aucune installation requise)
-3. **Connectez** votre robot Thymio
-4. **Profitez** du contrôle vocal !
+### 1. Exécutable (recommandé)
+1. Téléchargez `VoxThymio.exe` depuis `dist/VoxThymio.exe`
+2. Double-cliquez pour lancer (aucune installation requise)
+3. Connectez votre robot Thymio
+4. Profitez du contrôle vocal !
 
-### Option 2: Code Source
+### 2. Depuis le code source
+
 ```bash
 # Installer les dépendances
 pip install -r requirements.txt
 
-# Lancer l'interface graphique
+# Lancer l’interface graphique
 python voxthymio_gui.py
 ```
 
-### Option 3: Avec Splash Screen
+### 3. Avec écran de démarrage
+
 ```bash
-# Lancer avec écran de démarrage
 python voxthymio_launcher.py
 ```
 
 ---
 
-## 🎮 Guide d'Utilisation
+## 🕹️ Utilisation
 
-### 🔌 Connexion Initial
-1. **Connectez** votre Thymio via USB ou Bluetooth
-2. **Lancez** VoxThymio
-3. **Cliquez** "Connexion" dans l'interface
-4. **Attendez** la confirmation "Robot connecté"
+### Connexion initiale
+1. Connectez votre Thymio via USB ou Bluetooth
+2. Lancez VoxThymio
+3. Cliquez sur « Connexion » dans l’interface
+4. Attendez la confirmation « Robot connecté »
 
-### 🎤 Commandes Vocales
-| Commande | Synonymes | Action |
-|----------|-----------|---------|
-| `"avance"` | "en avant" | Avancer |
-| `"recule"` | "en arrière" | Reculer |
-| `"gauche"` | "tourne à gauche" | Tourner à gauche |
-| `"droite"` | "tourne à droite" | Tourner à droite |
-| `"stop"` | "arrête" | Arrêter |
+### Commandes vocales principales
 
-### 🎮 Contrôle Manuel
-- Utilisez les **boutons directionnels** pour un contrôle précis
-- **Stop d'urgence** toujours accessible
-- **Journal d'activité** pour suivre toutes les actions
+| Commande   | Synonymes             | Action                |
+|------------|-----------------------|-----------------------|
+| avance     | en avant              | Avancer               |
+| recule     | en arrière            | Reculer               |
+| gauche     | tourne à gauche       | Tourner à gauche      |
+| droite     | tourne à droite       | Tourner à droite      |
+| stop       | arrête                | Arrêter               |
+
+### Contrôle manuel
+- Utilisez les boutons directionnels pour un contrôle précis
+- Stop d’urgence toujours accessible
+- Journal d’activité pour suivre toutes les actions
 
 ---
 
-## 📋 Configuration Requise
+## 🖥️ Configuration requise
 
-### 🔧 Système
 - **OS** : Windows 10/11 (64-bit)
-- **RAM** : 4 GB minimum, 8 GB recommandé
-- **Espace** : 500 MB libre
+- **RAM** : 4 Go minimum (8 Go recommandé)
+- **Espace disque** : 500 Mo libre
 - **Microphone** : Intégré ou externe
-
-### 🤖 Robot
-- **Thymio II** avec firmware récent
-- **Connexion** : USB ou Bluetooth
-- **Drivers** : Thymio Suite installé (recommandé)
+- **Robot** : Thymio II avec firmware récent, connexion USB/Bluetooth, Thymio Suite installé
 
 ---
 
 ## 🛠️ Développement
 
-### Architecture Technique
+### Architecture
+
 ```
 VoxThymio/
 ├── src/
-│   ├── voice_controller.py      # Reconnaissance vocale
+│   ├── voice_controller.py        # Reconnaissance vocale
 │   └── communication/
-│       └── thymio_controller.py # Communication robot
-├── voxthymio_gui.py            # Interface graphique
-├── voxthymio_launcher.py       # Splash screen
-├── build_executable.py        # Script de packaging
-└── dist/
-    └── VoxThymio.exe          # Exécutable final
+│       └── thymio_controller.py  # Communication robot
+├── voxthymio_gui.py              # Interface graphique
+├── voxthymio_launcher.py         # Splash screen
+├── utils/build_executable.py     # Script de packaging
+└── dist/VoxThymio.exe            # Exécutable final
 ```
 
-### Technologies Utilisées
-- **Python 3.10+** - Langage principal
-- **tkinter** - Interface graphique
-- **SpeechRecognition** - Reconnaissance vocale
-- **tdmclient** - Communication Thymio
-- **PyInstaller** - Packaging exécutable
+### Technologies
+
+- **Python 3.10+**
+- **tkinter** (interface graphique)
+- **SpeechRecognition** (reconnaissance vocale)
+- **tdmclient** (communication Thymio)
+- **PyInstaller** (packaging)
 
 ---
 
-## 📦 Créer l'Exécutable
+## 📦 Création de l’exécutable
 
-### Méthode Automatique
+Automatique :
 ```bash
-python build_executable.py
+python utils/build_executable.py
 ```
 
-### Méthode Manuelle
+Manuelle :
 ```bash
-pyinstaller --onefile --windowed --name=VoxThymio --icon=robot.ico voxthymio_gui.py
+pyinstaller --onefile --windowed --name=VoxThymio --icon=gui/robot.ico gui/voxthymio_gui.py
 ```
 
 ---
@@ -130,11 +128,10 @@ pyinstaller --onefile --windowed --name=VoxThymio --icon=robot.ico voxthymio_gui
 
 **Développeur** : Espérance AYIWAHOUN  
 **Organisation** : AI4Innov  
-**Version** : 1.0.0  
-**Licence** : MIT  
+**Licence** : MIT
 
 ---
 
-**🎉 VoxThymio - L'avenir du contrôle robotique vocal**
+**🎉 VoxThymio – L’avenir du contrôle robotique vocal !**
 
 *Développé avec passion par Espérance AYIWAHOUN pour AI4Innov*
