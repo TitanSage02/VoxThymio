@@ -131,8 +131,9 @@ Le traitement d'une commande vocale suit le pipeline suivant :
    - Gestion des timeouts et du bruit ambiant
 
 2. **Transcription vocale**
-   - Conversion parole → texte via Google Speech Recognition
-   - Support du français
+   - Conversion parole → texte via Whisper (local, sans connexion Internet)
+   - Support du français et haute précision
+   - Fonctionnement entièrement hors ligne
 
 3. **Classification d'intention par BERT**
    - Analyse du texte avec modèle BERT pré-entraîné
@@ -217,6 +218,8 @@ Pour améliorer la reconnaissance vocale ou ajouter de nouvelles intentions :
 | **"Impossible de se connecter au Thymio"** | Assurez-vous que Thymio Suite est en cours d'exécution et qu'un robot est disponible |
 | **"Commande non reconnue"** | La parole n'a pas été correctement associée à une commande dans `commands.json`. Parlez plus clairement ou utilisez des mots-clés plus proches des commandes existantes |
 | **"Erreur de classification"** | Problème avec le modèle BERT. Vérifiez que tous les fichiers dans le dossier `models/` sont présents et non corrompus |
+| **"Erreur Whisper"** | Assurez-vous que Whisper est correctement installé. Exécutez `pip install openai-whisper` |
+| **"Modèle Whisper lent"** | Optez pour faster-whisper (`pip install faster-whisper`) et modifiez le code pour l'utiliser |
 | **Avertissements du modèle** | Ces avertissements sont généralement sans conséquence et ont été supprimés dans les dernières versions |
 | **Commande reconnue mais non exécutée** | Vérifiez la syntaxe du code Aseba dans `commands.json` |
 

@@ -3,13 +3,14 @@ tdmclient>=0.1.0
 
 # Reconnaissance vocale
 SpeechRecognition>=3.10.0
+openai-whisper>=20230314
+
 
 # Support audio pour le microphone
 pyaudio>=0.2.11
 
 # Packaging en exécutable
 pyinstaller>=5.0.0
-
 
 # Classification d'intention (BERT)
 transformers>=4.0.0

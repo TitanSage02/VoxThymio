@@ -77,6 +77,7 @@ class VoiceController:
         # Journalisation et initialisation
         self._setup_logging()
         self._initialize_microphone()
+        self._check_whisper_availability()
 
         # Chargement des commandes pour la reconnaissance vocale
         self._load_voice_commands()
@@ -84,6 +85,23 @@ class VoiceController:
         # Chargement du classifieur d'intention BERT
         self.logger.info(f"Chargement du modèle BERT depuis: {intent_model_path}")
         self.intent_classifier = IntentClassifier(model_path=intent_model_path)
+    
+    def _check_whisper_availability(self) -> None:
+        """Vérifie si Whisper est disponible et correctement installé."""
+        try:
+            # Tenter d'accéder à la méthode recognize_whisper
+            if not hasattr(self.recognizer, 'recognize_whisper'):
+                self.logger.warning("⚠️ Whisper n'est pas disponible dans cette version de SpeechRecognition")
+                self.logger.info("ℹ️ Installation recommandée: pip install --upgrade speechrecognition openai-whisper")
+                return False
+            
+            self.logger.info("✅ Whisper est disponible pour la reconnaissance vocale locale")
+        
+            return True
+        
+        except Exception as e:
+            self.logger.error(f"❌ Erreur lors de la vérification de Whisper: {e}")
+            return False
     
     def _load_voice_commands(self) -> None:
         """Charge les commandes vocales depuis le fichier JSON.
@@ -178,11 +196,24 @@ class VoiceController:
             
             # 2. TRANSCRIPTION VOCALE
             self.logger.info("🔄 Transcription en cours...")
-            text = self.recognizer.recognize_google(audio, language="fr-FR")
-           
-            # Passer à whisper 
-            # text = self.recognizer.recognize_whisper(audio, language="fr-FR")
-            # self.recognizer.recognize_whisper(audio, language="fr-FR")
+            try:
+                # Utilisation de Whisper pour la reconnaissance vocale locale
+                # Whisper utilise des codes de langue simples sans région (ex: "fr" au lieu de "fr-FR")
+                text = self.recognizer.recognize_whisper(audio, language="fr")
+                self.logger.info(f"✓ Texte transcrit via Whisper: '{text}'")
+            except AttributeError:
+                # Fallback à Google si Whisper n'est pas disponible
+                self.logger.warning("⚠️ Whisper non disponible, utilisation de Google Speech Recognition")
+                text = self.recognizer.recognize_google(audio, language="fr-FR")
+                self.logger.info(f"✓ Texte transcrit via Google: '{text}'")
+            except Exception as e:
+                self.logger.error(f"❌ Erreur de transcription Whisper: {e}")
+                return VoiceCommand(
+                    text="", 
+                    confidence=0.0, 
+                    status=VoiceCommandStatus.ERROR
+                )
+            
             if not text:
                 return VoiceCommand(
                     text="", 
