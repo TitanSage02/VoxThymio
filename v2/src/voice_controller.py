@@ -1,6 +1,9 @@
 """
-Contrôleur vocal pour le robot Thymio - Version 2
-Support amélioré pour les commandes vocales
+Contrôleur vocal pour le robot Thymio
+Pipeline : Audio → Transcription → Classification BERT → Commande
+
+Développé par Espérance AYIWAHOUN pour AI4Innov
+Projet : VoxThymio - Système de contrôle intelligent du robot Thymio
 """
 
 import speech_recognition as sr
@@ -10,23 +13,31 @@ from dataclasses import dataclass
 from enum import Enum
 import json
 import pathlib
+import time
 
-# Classification d'intention
+# Classification d'intention basée sur BERT
 from .intent_classifier import IntentClassifier
 
 
 class VoiceCommandStatus(Enum):
     """États possibles d'une commande vocale."""
-    SUCCESS = "success"
-    ERROR = "error"
-    UNKNOWN_COMMAND = "unknown_command"
-    NO_SPEECH = "no_speech"
-    TIMEOUT = "timeout"
+    SUCCESS = "success"           # Commande reconnue avec succès
+    ERROR = "error"               # Erreur technique
+    UNKNOWN_COMMAND = "unknown_command"  # Commande non reconnue
+    NO_SPEECH = "no_speech"       # Pas de parole détectée
+    TIMEOUT = "timeout"           # Timeout d'écoute
 
 
 @dataclass
 class VoiceCommand:
-    """Représente une commande vocale reconnue."""
+    """Représente une commande vocale reconnue.
+    
+    Attributes:
+        text: Texte brut transcrit
+        confidence: Niveau de confiance (0.0-1.0)
+        status: Statut de la commande (voir VoiceCommandStatus)
+        command_key: Clé de commande identifiée (si succès)
+    """
     text: str
     confidence: float
     status: VoiceCommandStatus
@@ -34,126 +45,75 @@ class VoiceCommand:
 
 
 class VoiceController:
-    """Contrôleur vocal pour le robot Thymio."""
+    """Contrôleur vocal pour le robot Thymio.
+    
+    Implémente le pipeline complet:
+    1. Capture audio (via microphone)
+    2. Transcription (via Google Speech Recognition)
+    3. Classification d'intention (via modèle BERT)
+    4. Mappage vers commande Thymio
+    """
     
     def __init__(self, intent_model_path: str = './intent_model'):
-        """Initialise le contrôleur vocal."""
-        # Configuration du reconnaisseur
-        self.recognizer = sr.Recognizer()
-        self.recognizer.energy_threshold = 300
-        self.recognizer.dynamic_energy_threshold = True
-        self.recognizer.pause_threshold = 0.8
+        """Initialise le contrôleur vocal avec le pipeline complet.
         
+        Args:
+            intent_model_path: Chemin vers le modèle BERT de classification d'intention
+        """
+        # Configuration du reconnaisseur vocal
+        self.recognizer = sr.Recognizer()
+        self.recognizer.energy_threshold = 300          # Sensibilité du microphone
+        self.recognizer.dynamic_energy_threshold = True # Ajustement automatique
+        self.recognizer.pause_threshold = 0.8           # Pause entre les mots (secondes)
+        
+        # Configuration des timeouts
+        self.timeout = 10.0             # Timeout global de la session d'écoute
+        self.phrase_timeout = 10.0       # Timeout pour une phrase individuelle
+
         # Configuration du microphone
         self.microphone = None
-        self.timeout = 10.0
-        self.phrase_timeout = 3.0
         self.microphone_available = False
         
-        # Configuration du logging et initialisation du microphone
+        # Journalisation et initialisation
         self._setup_logging()
         self._initialize_microphone()
 
         # Chargement des commandes pour la reconnaissance vocale
         self._load_voice_commands()
 
-        # Chargement du classifieur d'intention
+        # Chargement du classifieur d'intention BERT
+        self.logger.info(f"Chargement du modèle BERT depuis: {intent_model_path}")
         self.intent_classifier = IntentClassifier(model_path=intent_model_path)
-        
-        
     
     def _load_voice_commands(self) -> None:
-        """Charge les commandes depuis le fichier JSON et les associe à des commandes vocales."""
-        # Commandes par défaut
-        self.voice_commands = {
-            "avancer": "avancer",
-            "avance": "avancer",
-            "reculer": "reculer",
-            "recule": "reculer",
-            "gauche": "tourner_gauche",
-            "droite": "tourner_droite",
-            "arrêter": "arreter",
-            "arrête": "arreter",
-            "stop": "arreter",
-            "rouge": "led_rouge",
-            "vert": "led_vert",
-            "bleu": "led_bleu",
-            "éteindre": "led_eteindre",
-            "quitter": "quitter"
-        }
+        """Charge les commandes vocales depuis le fichier JSON.
         
-        # Association vocale pour toutes les commandes dans le fichier JSON
+        Le modèle BERT est déjà entraîné pour prédire directement
+        les commandes qui sont définies dans commands.json.
+        """
         try:
-            # Charge les commandes Thymio disponibles
+            # Chemin vers commands.json
             commands_path = pathlib.Path(__file__).parent.parent / "commands.json"
             
             with open(commands_path, 'r', encoding='utf-8') as f:
                 commands = json.load(f)
+                
+            # Stocke les commandes disponibles - pas besoin de mapping complexe
+            # puisque le modèle BERT renvoie directement ces commandes
+            self.available_commands = list(commands.keys())
             
-            # # Crée les correspondances vocales automatiques
-            # for cmd in commands.keys():
-            #     # Créer des variantes phonétiques pertinentes
-            #     self._add_voice_mappings(cmd)
+            # Initialise un dictionnaire vide - sert uniquement à la compatibilité
+            self.voice_commands = {}
+            
+            self.logger.info(f"✅ {len(commands)} commandes chargées depuis {commands_path}")
                 
         except Exception as e:
-            self.logger.error(f"❌ Erreur lors du chargement des commandes vocales: {e}")
-    
-    # def _add_voice_mappings(self, command_key: str) -> None:
-    #     """Ajoute des mappings vocaux pour une commande."""
-    #     # Ajoute la version de base
-    #     self.voice_commands[command_key] = command_key
-        
-    #     # Ajoute des variantes selon le type de commande
-    #     if command_key.startswith("avancer"):
-    #         if command_key == "avancer":
-    #             self.voice_commands["avance"] = command_key
-        
-    #     elif command_key.startswith("reculer"):
-    #         if command_key == "reculer":
-    #             self.voice_commands["recule"] = command_key
-        
-    #     elif "gauche" in command_key:
-    #         # Variantes pour tourner à gauche
-    #         if command_key == "tourner_gauche":
-    #             self.voice_commands["gauche"] = command_key
-    #             self.voice_commands["à gauche"] = command_key
-    #             self.voice_commands["tourne à gauche"] = command_key
-    #             self.voice_commands["va à gauche"] = command_key
-    #         if command_key == "tourner_gauche_lent":
-    #             self.voice_commands["gauche lent"] = command_key
-    #             self.voice_commands["tourne lentement à gauche"] = command_key
-        
-    #     elif "droite" in command_key:
-    #         # Variantes pour tourner à droite
-    #         if command_key == "tourner_droite":
-    #             self.voice_commands["droite"] = command_key
-    #             self.voice_commands["à droite"] = command_key
-    #             self.voice_commands["tourne à droite"] = command_key
-    #             self.voice_commands["va à droite"] = command_key
-    #         if command_key == "tourner_droite_lent":
-    #             self.voice_commands["droite lent"] = command_key
-    #             self.voice_commands["tourne lentement à droite"] = command_key
-        
-    #     elif command_key == "arreter":
-    #         self.voice_commands["arrête"] = command_key
-    #         self.voice_commands["stop"] = command_key
-    #         self.voice_commands["arrête-toi"] = command_key
-        
-    #     elif command_key.startswith("led_"):
-    #         color = command_key.replace("led_", "")
-    #         self.voice_commands[color] = command_key
-    #         self.voice_commands[f"lumière {color}"] = command_key
-        
-    #     elif command_key.startswith("note_"):
-    #         note = command_key.replace("note_", "")
-    #         self.voice_commands[note] = command_key
-    #         self.voice_commands[f"joue {note}"] = command_key
-    #         self.voice_commands[f"note {note}"] = command_key
-        
-    #     elif command_key.startswith("son_"):
-    #         son = command_key.replace("son_", "")
-    #         self.voice_commands[son] = command_key
-    #         self.voice_commands[f"son {son}"] = command_key
+            self.logger.error(f"❌ Erreur lors du chargement des commandes: {e}")
+            self.available_commands = [
+                "avancer", "reculer", "arreter", "tourner_gauche", "tourner_droite",
+                "led_rouge", "led_vert", "led_bleu", "led_eteindre", "quitter"
+            ]
+            self.logger.info("⚠️ Utilisation des commandes par défaut uniquement")
             
     def _initialize_microphone(self) -> None:
         """Initialise le microphone."""
@@ -181,23 +141,19 @@ class VoiceController:
             self.logger.addHandler(handler)
             self.logger.setLevel(logging.INFO)
     
-    def _find_command(self, text: str) -> Optional[str]:
-        """Trouve la commande correspondant au texte reconnu."""
-        text = text.lower().strip()
-        
-        # Recherche exacte
-        if text in self.voice_commands:
-            return self.voice_commands[text]
-        
-        # Recherche partielle
-        for voice_cmd, cmd_key in self.voice_commands.items():
-            if voice_cmd in text:
-                return cmd_key
-        
-        return None
-    
     def listen_for_command(self) -> VoiceCommand:
-        """Écoute et reconnaît une commande vocale."""
+        """Écoute, reconnaît et interprète une commande vocale.
+        
+        Pipeline complet:
+        1. Capture audio via microphone
+        2. Transcription via Google Speech Recognition
+        3. Classification d'intention via modèle BERT
+        4. Mappage vers commande Thymio
+        
+        Returns:
+            VoiceCommand: Objet contenant le résultat du traitement
+        """
+        # Vérification de la disponibilité du microphone
         if not self.microphone_available:
             return VoiceCommand(
                 text="", 
@@ -206,15 +162,22 @@ class VoiceController:
             )
 
         try:
-            with self.microphone as source:
-                self.logger.info("🎤 Écoute...")
-                audio = self.recognizer.listen(
-                                    source, 
-                                    timeout=self.timeout, 
-                                    phrase_time_limit=self.phrase_timeout
-                                    )
+            # 1. CAPTURE AUDIO
+            start_time = time.time()
+            self.logger.info("🎤 Capture audio en cours...")
             
-            # Reconnaissance vocale avec Google (fr-FR)
+            with self.microphone as source:
+                audio = self.recognizer.listen(
+                    source, 
+                    timeout=self.timeout,
+                    phrase_time_limit=self.phrase_timeout
+                )
+            
+            capture_duration = time.time() - start_time
+            self.logger.info(f"✓ Audio capturé ({capture_duration:.1f}s)")
+            
+            # 2. TRANSCRIPTION VOCALE
+            self.logger.info("🔄 Transcription en cours...")
             text = self.recognizer.recognize_google(audio, language="fr-FR")
            
             # Passer à whisper 
@@ -227,34 +190,41 @@ class VoiceController:
                     status=VoiceCommandStatus.NO_SPEECH
                 )
             
-            self.logger.info(f"🗣️ Texte reconnu: '{text}'")
+            self.logger.info(f"✓ Texte transcrit: '{text}'")
             
-
-            # Utilisation du classifieur d'intention pour déterminer la commande
+            # 3. CLASSIFICATION D'INTENTION VIA BERT
             try:
+                self.logger.info("🧠 Classification d'intention en cours...")
                 predicted_intent = self.intent_classifier.predict(text)
-                if predicted_intent in self.voice_commands:
+                self.logger.info(f"✓ Intention identifiée: '{predicted_intent}'")
+                
+                # 4. VÉRIFICATION DE LA COMMANDE PRÉDITE
+                if predicted_intent in self.available_commands:
+                    self.logger.info(f"✓ Commande valide: '{predicted_intent}'")
+                    
                     return VoiceCommand(
                         text=text,
-                        confidence=1.0,
+                        confidence=1.0,  # Confiance fixée à 1.0 pour BERT
                         status=VoiceCommandStatus.SUCCESS,
-                        command_key=self.voice_commands[predicted_intent]
+                        command_key=predicted_intent
                     )
                 else:
+                    self.logger.warning(f"⚠️ Commande non reconnue: '{predicted_intent}'")
                     return VoiceCommand(
                         text=text,
                         confidence=1.0,
                         status=VoiceCommandStatus.UNKNOWN_COMMAND
                     )
             except Exception as e:
-                self.logger.error(f"Erreur classification d'intention: {e}")
+                self.logger.error(f"❌ Erreur de classification: {e}")
                 return VoiceCommand(
                     text=text,
-                    confidence=1.0,
+                    confidence=0.0,
                     status=VoiceCommandStatus.ERROR
                 )
 
         except sr.UnknownValueError:
+            self.logger.warning("⚠️ Parole non reconnue")
             return VoiceCommand(
                 text="", 
                 confidence=0.0, 
@@ -262,6 +232,7 @@ class VoiceController:
             )
         
         except sr.WaitTimeoutError:
+            self.logger.warning("⚠️ Timeout d'écoute")
             return VoiceCommand(
                 text="", 
                 confidence=0.0, 
@@ -269,7 +240,7 @@ class VoiceController:
             )
         
         except Exception as e:
-            self.logger.error(f"Erreur: {e}")
+            self.logger.error(f"❌ Erreur: {e}")
             return VoiceCommand(
                 text="", 
                 confidence=0.0, 
@@ -277,15 +248,27 @@ class VoiceController:
             )
 
     def is_microphone_available(self) -> bool:
-        """Vérifie si le microphone est disponible."""
+        """Vérifie si le microphone est disponible pour le contrôle vocal.
+        
+        Returns:
+            bool: True si un microphone est disponible, False sinon
+        """
         return self.microphone_available
     
-    def list_commands(self) -> Dict[str, str]:
-        """Retourne la liste des commandes vocales disponibles."""
-        return self.voice_commands.copy()
+    def list_commands(self) -> List[str]:
+        """Retourne la liste des commandes disponibles.
+        
+        Returns:
+            List[str]: Liste des commandes disponibles
+        """
+        return self.available_commands.copy()
     
-    def get_available_commands_by_category(self) -> Dict[str, List[Tuple[str, str]]]:
-        """Retourne les commandes disponibles organisées par catégorie."""
+    def get_available_commands_by_category(self) -> Dict[str, List[str]]:
+        """Organise les commandes disponibles par catégorie pour l'affichage.
+        
+        Returns:
+            Dict[str, List[str]]: Dictionnaire catégorie → liste de commandes
+        """
         categories = {
             "Mouvement": [],
             "LEDs": [],
@@ -294,23 +277,17 @@ class VoiceController:
             "Autres": []
         }
         
-        # Liste unique des commandes disponibles (évite les doublons)
-        unique_commands = {}
-        for voice_cmd, cmd in self.voice_commands.items():
-            if cmd not in unique_commands:
-                unique_commands[cmd] = voice_cmd
-        
         # Catégorisation des commandes
-        for cmd, voice_cmd in unique_commands.items():
+        for cmd in self.available_commands:
             if any(x in cmd for x in ["avancer", "reculer", "tourner", "pivoter", "demi_tour"]):
-                categories["Mouvement"].append((cmd, voice_cmd))
+                categories["Mouvement"].append(cmd)
             elif any(x in cmd for x in ["led", "leds"]):
-                categories["LEDs"].append((cmd, voice_cmd))
+                categories["LEDs"].append(cmd)
             elif any(x in cmd for x in ["son", "note", "volume"]):
-                categories["Sons"].append((cmd, voice_cmd))
+                categories["Sons"].append(cmd)
             elif cmd == "quitter" or cmd == "arreter":
-                categories["Système"].append((cmd, voice_cmd))
+                categories["Système"].append(cmd)
             else:
-                categories["Autres"].append((cmd, voice_cmd))
+                categories["Autres"].append(cmd)
         
         return categories
