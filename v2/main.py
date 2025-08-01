@@ -170,10 +170,10 @@ class ThymioVoiceInterface:
         
         # Récupération des commandes disponibles
         self.available_commands = self.controller.get_available_commands()
-        print(f"✅ {len(self.available_commands)} commandes disponibles")
+        # print(f"✅ {len(self.available_commands)} commandes disponibles")
         
         # Initialisation du contrôleur vocal
-        self.voice_controller = VoiceController()
+        self.voice_controller = VoiceController(intent_model_path="D:/ORGANISATIONS/Ai4Innov/VoxThymio/v2/models",)
         if not self.voice_controller.is_microphone_available():
             print("⚠️ ATTENTION: Microphone non disponible")
             print("Seul le mode manuel sera possible")
