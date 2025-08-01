@@ -11,6 +11,9 @@ from enum import Enum
 import json
 import pathlib
 
+# Classification d'intention
+from .intent_classifier import IntentClassifier
+
 
 class VoiceCommandStatus(Enum):
     """États possibles d'une commande vocale."""
@@ -33,7 +36,7 @@ class VoiceCommand:
 class VoiceController:
     """Contrôleur vocal pour le robot Thymio."""
     
-    def __init__(self):
+    def __init__(self, intent_model_path: str = './intent_model'):
         """Initialise le contrôleur vocal."""
         # Configuration du reconnaisseur
         self.recognizer = sr.Recognizer()
@@ -53,6 +56,9 @@ class VoiceController:
 
         # Chargement des commandes pour la reconnaissance vocale
         self._load_voice_commands()
+
+        # Chargement du classifieur d'intention
+        self.intent_classifier = IntentClassifier(model_path=intent_model_path)
         
         
     
@@ -89,7 +95,6 @@ class VoiceController:
             #     # Créer des variantes phonétiques pertinentes
             #     self._add_voice_mappings(cmd)
                 
-            self.logger.info(f"✅ {len(self.voice_commands)} commandes vocales disponibles")
         except Exception as e:
             self.logger.error(f"❌ Erreur lors du chargement des commandes vocales: {e}")
     
@@ -211,7 +216,9 @@ class VoiceController:
             
             # Reconnaissance vocale avec Google (fr-FR)
             text = self.recognizer.recognize_google(audio, language="fr-FR")
+           
             # Passer à whisper 
+            # text = self.recognizer.recognize_whisper(audio, language="fr-FR")
             # self.recognizer.recognize_whisper(audio, language="fr-FR")
             if not text:
                 return VoiceCommand(
@@ -222,21 +229,29 @@ class VoiceController:
             
             self.logger.info(f"🗣️ Texte reconnu: '{text}'")
             
-            # Recherche de la commande correspondante
-            command_key = self._find_command(text)
-            
-            if command_key:
+
+            # Utilisation du classifieur d'intention pour déterminer la commande
+            try:
+                predicted_intent = self.intent_classifier.predict(text)
+                if predicted_intent in self.voice_commands:
+                    return VoiceCommand(
+                        text=text,
+                        confidence=1.0,
+                        status=VoiceCommandStatus.SUCCESS,
+                        command_key=self.voice_commands[predicted_intent]
+                    )
+                else:
+                    return VoiceCommand(
+                        text=text,
+                        confidence=1.0,
+                        status=VoiceCommandStatus.UNKNOWN_COMMAND
+                    )
+            except Exception as e:
+                self.logger.error(f"Erreur classification d'intention: {e}")
                 return VoiceCommand(
-                    text=text, 
-                    confidence=1.0, 
-                    status=VoiceCommandStatus.SUCCESS, 
-                    command_key=command_key
-                )
-            else:
-                return VoiceCommand(
-                    text=text, 
-                    confidence=1.0, 
-                    status=VoiceCommandStatus.UNKNOWN_COMMAND
+                    text=text,
+                    confidence=1.0,
+                    status=VoiceCommandStatus.ERROR
                 )
 
         except sr.UnknownValueError:
@@ -254,7 +269,7 @@ class VoiceController:
             )
         
         except Exception as e:
-            self.logger.error(f"❌ Erreur: {e}")
+            self.logger.error(f"Erreur: {e}")
             return VoiceCommand(
                 text="", 
                 confidence=0.0, 
