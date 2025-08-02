@@ -1,3 +1,0 @@
-"""
-Package principal de VoxThymio
-""" 
