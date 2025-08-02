@@ -272,8 +272,8 @@ class VoxThymioGUI:
         
         # Boutons LED optimisés avec grille responsive
         led_frame = tk.LabelFrame(frame, text="💡 LEDs", 
-                                 bg="#2d2d2d", fg="white",
-                                 font=("Segoe UI", 9, "bold"))
+                     bg="#2d2d2d", fg="white",
+                     font=("Segoe UI", 9, "bold"))
         led_frame.pack(fill="x", padx=10, pady=10)
         
         led_grid = tk.Frame(led_frame, bg="#2d2d2d")
@@ -282,26 +282,40 @@ class VoxThymioGUI:
         # Configuration des colonnes pour un alignement parfait
         for i in range(4):
             led_grid.columnconfigure(i, weight=1)
-        
+
+        # Styles personnalisés pour chaque couleur de LED
+        style = ttk.Style()
+        style.configure('Red.TButton', background="#e74c3c", foreground="white", font=("Segoe UI", 10, "bold"))
+        style.map('Red.TButton', background=[('active', '#c0392b'), ('pressed', '#a93226')])
+
+        style.configure('Green.TButton', background="#27ae60", foreground="white", font=("Segoe UI", 10, "bold"))
+        style.map('Green.TButton', background=[('active', '#229954'), ('pressed', '#196f3d')])
+
+        style.configure('Blue.TButton', background="#2980b9", foreground="white", font=("Segoe UI", 10, "bold"))
+        style.map('Blue.TButton', background=[('active', '#2471a3'), ('pressed', '#1b4f72')])
+
+        style.configure('Off.TButton', background="#555555", foreground="#dddddd", font=("Segoe UI", 10, "bold"))
+        style.map('Off.TButton', background=[('active', '#333333'), ('pressed', '#222222')])
+
         ttk.Button(led_grid, text="🔴 Rouge", 
-                  command=lambda: self.manual_command("led_rouge"),
-                  style="Modern.TButton").grid(row=0, column=0, padx=3, pady=3, 
-                                              sticky="ew", ipadx=3, ipady=2)
+              command=lambda: self.manual_command("led_rouge"),
+              style="Red.TButton").grid(row=0, column=0, padx=3, pady=3, 
+                            sticky="ew", ipadx=3, ipady=2)
         
         ttk.Button(led_grid, text="🟢 Vert", 
-                  command=lambda: self.manual_command("led_vert"),
-                  style="Modern.TButton").grid(row=0, column=1, padx=3, pady=3, 
-                                              sticky="ew", ipadx=3, ipady=2)
+              command=lambda: self.manual_command("led_vert"),
+              style="Green.TButton").grid(row=0, column=1, padx=3, pady=3, 
+                              sticky="ew", ipadx=3, ipady=2)
         
         ttk.Button(led_grid, text="🔵 Bleu", 
-                  command=lambda: self.manual_command("led_bleu"),
-                  style="Modern.TButton").grid(row=0, column=2, padx=3, pady=3, 
-                                              sticky="ew", ipadx=3, ipady=2)
+              command=lambda: self.manual_command("led_bleu"),
+              style="Blue.TButton").grid(row=0, column=2, padx=3, pady=3, 
+                              sticky="ew", ipadx=3, ipady=2)
         
         ttk.Button(led_grid, text="⚫ Éteindre", 
-                  command=lambda: self.manual_command("led_eteindre"),
-                  style="Modern.TButton").grid(row=0, column=3, padx=3, pady=3, 
-                                              sticky="ew", ipadx=3, ipady=2)
+              command=lambda: self.manual_command("led_eteindre"),
+              style="Off.TButton").grid(row=0, column=3, padx=3, pady=3, 
+                            sticky="ew", ipadx=3, ipady=2)
     
     def create_voice_panel(self, parent):
         """Panneau de contrôle vocal."""
