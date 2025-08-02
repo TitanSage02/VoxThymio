@@ -77,8 +77,10 @@ Cette version exploite un modèle BERT de classification d'intention pour interp
 2. **Créez un environnement virtuel (recommandé)**
    ```bash
    python -m venv venv
+
    # Sur Windows
    venv\Scripts\activate
+   
    # Sur macOS/Linux
    source venv/bin/activate
    ```
@@ -184,7 +186,7 @@ v2/
 ### Personnalisation des commandes existantes
 
 1. Ouvrez le fichier `commands.json`
-2. **Important** : Ne modifiez que le code Aseba (valeurs), pas les noms des commandes (clés)
+2. **Important** : Ne modifiez que le code, pas les noms des commandes (clés)
 3. Format du fichier :
    ```json
    {
@@ -223,7 +225,6 @@ Pour améliorer la reconnaissance vocale ou ajouter de nouvelles intentions :
 | **"Erreur de classification"** | Problème avec le modèle BERT. Vérifiez que tous les fichiers dans le dossier `models/` sont présents et non corrompus |
 | **"Erreur Whisper"** | Assurez-vous que Whisper est correctement installé. Exécutez `pip install openai-whisper` |
 | **"Modèle Whisper lent"** | Optez pour faster-whisper (`pip install faster-whisper`) et modifiez le code pour l'utiliser |
-| **Avertissements du modèle** | Ces avertissements sont généralement sans conséquence et ont été supprimés dans les dernières versions |
 | **Commande reconnue mais non exécutée** | Vérifiez la syntaxe du code Aseba dans `commands.json` |
 
 > ⚠️ **Important** : Si vous avez modifié les noms des commandes (clés) dans `commands.json`, le modèle BERT ne pourra pas les reconnaître. Vous devez réentraîner le modèle pour prendre en compte ces modifications.
