@@ -27,7 +27,223 @@
 
 ## ✨ Présentation
 
-**VoxThymio** est un système avancé de contrôle du robot éducatif Thymio, qui intègre deux modes complémentaires :
+# VoxThymio - Contrôle Intelligent avec IA
+
+**VoxThymio** est un système de contrôle intelligent pour le robot Thymio utilisant l'intelligence artificielle pour comprendre et exécuter des commandes en langage naturel français.
+
+## 🚀 Nouvelle Architecture Intelligente
+
+Cette version révolutionnaire utilise :
+- **BERT français** (CamemBERT) pour la compréhension du langage naturel
+- **ChromaDB** comme base vectorielle pour stocker les embeddings
+- **Recherche de similarité** pour matcher les commandes
+- **Apprentissage dynamique** pour ajouter de nouvelles commandes
+
+### 🧠 Fonctionnement de l'IA
+
+1. **Génération d'embeddings** : BERT convertit les descriptions en vecteurs numériques
+2. **Recherche de similarité** : Comparaison cosinus entre la requête et les commandes stockées
+3. **Seuils intelligents** :
+   - **≥ 0.6** : Exécution automatique de la commande
+   - **≥ 0.85** : Apprentissage automatique d'une nouvelle commande
+
+## 📦 Installation
+
+### Prérequis
+- **Python 3.8+**
+- **Thymio Suite** installé et robot connecté
+- **8GB RAM minimum** (pour BERT)
+
+### Installation automatique
+```bash
+python install.py
+```
+
+### Installation manuelle
+```bash
+pip install -r requirements.txt
+```
+
+## 🎮 Utilisation
+
+### Mode Console
+```bash
+python main.py
+```
+
+### Interface Graphique
+```bash
+python launch_gui.py
+```
+
+## 🎤 Commandes Vocales Exemples
+
+### Mouvements
+- "avancer rapidement"
+- "tourner vers la gauche"
+- "reculer lentement"
+- "arrêter le robot"
+
+### Éclairage
+- "allumer la LED en rouge"
+- "LED bleue"
+- "éteindre toutes les lumières"
+
+### Sons
+- "jouer un son heureux"
+- "volume maximum"
+- "jouer la note Do"
+
+## ➕ Ajouter des Commandes Personnalisées
+
+### Via l'Interface Graphique
+1. Onglet "Commandes" → "Ajouter une Nouvelle Commande"
+2. Saisir :
+   - **ID** : identifiant unique (ex: "dance_move")
+   - **Description** : "faire danser le robot en tournant"
+   - **Code Thymio** : 
+     ```
+     motor.left.target = 200
+     motor.right.target = -200
+     timer.period[0] = 1000
+     ```
+   - **Catégorie** : custom, movement, lights, sounds, advanced
+
+### Via l'API Python
+```python
+# Connexion et ajout d'une commande
+await voice_controller.process_voice_command("faire clignoter les LEDs en vert")
+
+# Ajout manuel
+result = voice_controller.add_new_command(
+    command_id="blink_green",
+    description="faire clignoter les LEDs en vert",
+    code="call leds.top(0,32,0)
+timer.period[0] = 500",
+    category="lights"
+)
+```
+
+## 🏗️ Architecture du Système
+
+```
+VoxThymio/
+├── main.py                     # Interface console principale
+├── launch_gui.py              # Lanceur interface graphique
+├── install.py                 # Script d'installation
+├── requirements.txt           # Dépendances Python
+├── config.json               # Configuration système
+├── commands.json             # Commandes par défaut
+├── src/                      # Code source principal
+│   ├── embedding_manager.py    # Gestionnaire BERT français
+│   ├── command_manager.py      # Base vectorielle ChromaDB
+│   ├── smart_voice_controller.py # Contrôleur IA principal
+│   └── communication/
+│       └── thymio_controller.py # Communication Thymio
+├── gui/                      # Interface graphique
+│   ├── modern_voxthymio_gui.py # GUI moderne avec Tkinter
+│   └── robot.ico             # Icône de l'application
+├── vector_db/               # Base ChromaDB (auto-créé)
+├── logs/                    # Fichiers de log
+└── exports/                 # Exportations de données
+```
+
+## ⚙️ Configuration Avancée
+
+### Ajustement des Seuils
+```python
+# Via l'interface ou le code
+voice_controller.update_thresholds(
+    execution_threshold=0.7,    # Plus strict pour l'exécution
+    learning_threshold=0.9      # Plus strict pour l'apprentissage
+)
+```
+
+### Modèles BERT Disponibles
+- `camembert-base` (par défaut) - Équilibré performance/mémoire
+- `camembert-large` - Meilleure précision, plus de mémoire
+- `flaubert/flaubert_base_cased` - Alternative française
+
+## 📊 Monitoring et Statistiques
+
+L'interface graphique propose :
+- **Tableau de bord** avec métriques en temps réel
+- **Analyse des similarités** pour tester les commandes
+- **Gestion des seuils** avec visualisation
+- **Export/Import** des bases de commandes
+
+## 🔧 Dépannage
+
+### Erreurs Courantes
+
+**"Modèle BERT non trouvé"**
+```bash
+# Vérifier la connexion internet et relancer
+python -c "from transformers import AutoModel; AutoModel.from_pretrained('camembert-base')"
+```
+
+**"ChromaDB database locked"**
+```bash
+# Supprimer le dossier vector_db et relancer
+rm -rf vector_db/
+```
+
+**"Thymio non détecté"**
+- Vérifier que Thymio Suite est lancé
+- Vérifier la connexion USB/Wireless
+- Redémarrer le robot
+
+### Performance
+- **CPU** : Multithreading automatique
+- **GPU** : Détection automatique CUDA si disponible
+- **Mémoire** : Optimisation automatique des embeddings
+
+## 🎯 Exemples d'Utilisation Avancée
+
+### Séquences Complexes
+```python
+# Créer une séquence de danse
+await voice_controller.process_voice_command("créer une danse avec des LEDs colorées")
+```
+
+### Commandes Conditionnelles
+```python
+# Ajouter une commande basée sur les capteurs
+command_code = """
+if prox.horizontal[2] > 1000:
+    motor.left.target = -200
+    motor.right.target = 200
+else:
+    motor.left.target = 200
+    motor.right.target = 200
+"""
+```
+
+## 🤝 Contribution
+
+Le système est conçu pour être extensible :
+1. **Nouveaux modèles BERT** : Modifier `embedding_manager.py`
+2. **Nouvelles bases vectorielles** : Étendre `command_manager.py`
+3. **Interfaces supplémentaires** : Créer dans `gui/`
+
+## 📄 Licence
+
+Développé par **Espérance AYIWAHOUN** pour **AI4Innov**.
+
+## 🏆 Fonctionnalités Clés
+
+✅ **Compréhension naturelle** du français avec BERT  
+✅ **Apprentissage automatique** de nouvelles commandes  
+✅ **Interface graphique moderne** avec contrôles avancés  
+✅ **Base vectorielle persistante** avec ChromaDB  
+✅ **Système de seuils configurables** pour la précision  
+✅ **Export/Import** de configurations de commandes  
+✅ **Monitoring en temps réel** des performances IA  
+✅ **Support multi-plateforme** (Windows, Linux, macOS)  
+
+---
+
+**VoxThymio - Quand l'intelligence artificielle rencontre la robotique éducative !** 🤖✨
 
 - **Mode manuel** : contrôle précis via clavier
 - **Mode vocal** : contrôle par la voix grâce à l'intelligence artificielle

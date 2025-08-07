@@ -8,7 +8,14 @@ openai-whisper>=20230314
 # Support audio pour le microphone
 pyaudio>=0.2.11
 
-# Classification d'intention (BERT)
+# BERT français et embeddings
 transformers>=4.0.0
 torch>=1.10.0
-joblib>=1.0.0
+sentence-transformers>=2.2.0
+
+# Base vectorielle
+chromadb>=0.4.0
+
+# Calcul de similarité
+numpy>=1.21.0
+scipy>=1.7.0
