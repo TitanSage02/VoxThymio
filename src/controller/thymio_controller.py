@@ -15,9 +15,9 @@ class ThymioController:
         self.client = ClientAsync()
         self.node = None
         self.connected = False
-        self.commands = self._load_commands()
+        self.commands = self._load_default_commands()
 
-    def _load_commands(self) -> Dict[str, str]:
+    def _load_default_commands(self) -> Dict[str, str]:
         """Charge les commandes depuis le fichier JSON."""
        
         # Commandes supportées par défaut
@@ -26,19 +26,14 @@ class ThymioController:
             "reculer": "motor.left.target = -200\nmotor.right.target = -200",
             "arreter": "motor.left.target = 0\nmotor.right.target = 0",
             "tourner_gauche": "motor.left.target = -100\nmotor.right.target = 100",
-            "tourner_droite": "motor.left.target = 100\nmotor.right.target = -100",
-            "led_rouge": "call leds.top(32,0,0)",
-            "led_vert": "call leds.top(0,32,0)",
-            "led_bleu": "call leds.top(0,0,32)",
-            "led_eteindre": "call leds.top(0,0,0)"
+            "tourner_droite": "motor.left.target = 100\nmotor.right.target = -100"
         }
 
     async def connect(self) -> bool:
         """Établit une connexion avec un robot Thymio."""
         try:
-            # with warnings.catch_warnings():
-            #     warnings.simplefilter("ignore")
-            if 1: 
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
                 await self.client.wait_for_status(self.client.NODE_STATUS_AVAILABLE)
                 self.node = self.client.first_node()
                 
@@ -81,7 +76,7 @@ class ThymioController:
             print(f"❌ Erreur lors de l'exécution de '{command}': {e}")
             return False
 
-    async def execute_raw_code(self, code: str) -> bool:
+    async def execute_code(self, code: str) -> bool:
         """Exécute directement du code Aseba sur le robot."""
         if not self.connected or not self.node:
             print("❌ Robot non connecté")
@@ -102,11 +97,11 @@ class ThymioController:
             try:
                 # Arrête le robot et éteint les LEDs
                 await self.execute_command("arreter")
-                await self.execute_command("led_eteindre")
                 
                 # Ferme la connexion
                 self.client.close()
                 self.connected = False
+                
                 print("👋 Thymio déconnecté")
             except Exception as e:
                 print(f"❌ Erreur lors de la déconnexion: {e}")
@@ -119,13 +114,6 @@ class ThymioController:
         """Retourne la liste des commandes disponibles."""
         return list(self.commands.keys())
     
-    def reload_commands(self) -> bool:
-        """Recharge les commandes depuis le fichier JSON."""
-        try:
-            self.commands = self._load_commands()
-            return True
-        except:
-            return False
             
 if __name__ == "__main__":
     """Point d'entrée pour tester le contrôleur."""
