@@ -288,3 +288,59 @@ class VectorDatabase:
         except Exception as e:
             print(f"❌ Erreur lors de la remise à zéro: {e}")
             return False
+
+
+# Test local du module
+if __name__ == "__main__":
+    print("🧪 Test du gestionnaire de base vectorielle")
+    
+    # Création d'une instance de test
+    db = VectorDatabase(db_path="./test_vector_db")
+    
+    # Affichage des statistiques initiales
+    stats = db.get_stats()
+    print(f"📊 Statistiques initiales: {stats}")
+    
+    # Test d'ajout de commandes
+    test_embedding = np.random.rand(384)  # Simuler un embedding
+    
+    print("\n➕ Test d'ajout de commandes")
+    db.add_command(
+        command_id="test_command_1",
+        description="Avancer rapidement",
+        code="motor.left.target = 200\nmotor.right.target = 200",
+        embedding=test_embedding
+    )
+    
+    db.add_command(
+        command_id="test_command_2",
+        description="Tourner à droite",
+        code="motor.left.target = 200\nmotor.right.target = -200",
+        embedding=np.random.rand(384)
+    )
+    
+    # Vérification de l'existence
+    print("\n🔍 Test de vérification d'existence")
+    exists = db.command_exists("test_command_1")
+    print(f"La commande 'test_command_1' existe: {exists}")
+    
+    # Récupération de toutes les commandes
+    print("\n📋 Liste des commandes:")
+    commands = db.get_all_commands()
+    for cmd in commands:
+        print(f"  • {cmd['command_id']}: {cmd['description']}")
+    
+    # Test de recherche de similarité
+    print("\n🔍 Test de recherche de similarité avec test_command_2")
+    similar = db.search_similar_commands(test_embedding, n_results=2)
+    for cmd in similar:
+        print(f"  • {cmd['command_id']} (similarité: {cmd['similarity']:.3f})")
+    
+    # Statistiques finales
+    stats = db.get_stats()
+    print(f"\n📊 Statistiques finales: {stats}")
+    
+    # Nettoyage
+    print("\n🧹 Nettoyage de la base de test")
+    db.reset_database()
+    print("Test terminé!")
