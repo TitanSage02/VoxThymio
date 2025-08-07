@@ -1,107 +1,40 @@
-"""
-Gestionnaire d'embeddings utilisant BERT français pour VoxThymio
-Permet de générer des embeddings de descriptions en langage naturel
-"""
-
-import torch
 import numpy as np
-from transformers import AutoTokenizer, AutoModel
-from typing import List, Tuple, Dict, Any
-import warnings
-
-# Suppression des avertissements
-warnings.filterwarnings("ignore", category=FutureWarning)
+import torch
+from sentence_transformers import SentenceTransformer
+import re
+from typing import List, Union
 
 
 class EmbeddingManager:
     """
-    Génère des embeddings en utilisant un modèle BERT français à partir de descriptions en langage naturel.
+    Génère des embeddings en utilisant un modèle Sentence Transformers multilingue
+    spécialement conçu pour la similarité sémantique.
     """
     
-    def __init__(self, model_name: str = "camembert-base"):
+    def __init__(self, model_name: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"):
         """
         Initialise le gestionnaire d'embeddings.
         
         Args:
-            model_name (str): Nom du modèle .
-                             Par défaut: "camembert-base" (BERT français)
+            model_name (str): Nom du modèle Sentence Transformers.
+                             Par défaut: "paraphrase-multilingual-MiniLM-L12-v2"
         """
-
+        
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         print(f"🔧 Utilisation du périphérique : {self.device}")
         
         try:
-            # Chargement du modèle et tokenizer BERT français
+            # Chargement du modèle Sentence Transformers
             print(f"📥 Chargement du modèle {model_name}...")
-            self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-            self.model = AutoModel.from_pretrained(model_name)
+            self.model = SentenceTransformer(model_name, 
+                                             device=str(self.device),
+                                             backend="onnx")
             
-            # Transfert sur le bon périphérique
-            self.model.to(self.device)
-            self.model.eval()
-            
-            print("✅ Modèle BERT français chargé et configuré.")
+            print("✅ Modèle Sentence Transformers chargé et configuré.")
             
         except Exception as e:
             print(f"❌ Erreur lors du chargement du modèle: {e}")
             raise RuntimeError(f"Impossible de charger le modèle {model_name}: {str(e)}")
-    
-    def generate_embedding(self, text: str) -> np.ndarray:
-        """
-        Génère un embedding pour un texte donné.
-        
-        Args:
-            text (str): Texte à encoder
-            
-        Returns:
-            np.ndarray: Embedding du texte (vecteur de features)
-        """
-        # Nettoyage et préparation du texte
-        cleaned_text = self._clean_text(text)
-        
-        # Tokenisation
-        inputs = self.tokenizer(
-            cleaned_text,
-            return_tensors='pt',
-            truncation=True,
-            padding=True,
-            max_length=128
-        )
-        
-        # Déplacement sur le bon périphérique
-        inputs = {k: v.to(self.device) for k, v in inputs.items()}
-        
-        # Génération de l'embedding
-        with torch.no_grad():
-            outputs = self.model(**inputs)
-            # Vérification de la présence de last_hidden_state
-            if not hasattr(outputs, 'last_hidden_state'):
-                raise ValueError("Le modèle ne retourne pas 'last_hidden_state'. Vérifiez le modèle utilisé.")
-            
-            # Utilisation de la moyenne des tokens comme représentation
-            embedding = outputs.last_hidden_state.mean(dim=1).cpu().numpy()
-
-            # Normalisation de l'embedding
-            embedding = embedding / np.linalg.norm(embedding) if np.linalg.norm(embedding) > 0 else embedding
-        
-        return embedding
-    
-    def generate_embeddings_batch(self, texts: List[str]) -> List[np.ndarray]:
-        """
-        Génère des embeddings pour une liste de textes.
-        
-        Args:
-            texts (List[str]): Liste de textes à encoder
-            
-        Returns:
-            List[np.ndarray]: Liste des embeddings
-        """
-
-        embeddings = []
-        for text in texts:
-            embedding = self.generate_embedding(text)
-            embeddings.append(embedding)
-        return embeddings
     
     def _clean_text(self, text: str) -> str:
         """
@@ -113,27 +46,249 @@ class EmbeddingManager:
         Returns:
             str: Texte nettoyé
         """
-        if not text:
-            return ""
+        if not isinstance(text, str):
+            text = str(text)
         
-        # Conversion en minuscules et suppression des espaces superflus
-        cleaned = text.lower().strip()
+        # Suppression des caractères spéciaux excessifs
+        text = re.sub(r'[^\w\sàâäéèêëïîôöùûüÿç\'-]', ' ', text)
         
-        # Suppression des caractères de contrôle et normalisation des espaces
-        cleaned = ' '.join(cleaned.split())
+        # Normalisation des espaces
+        text = re.sub(r'\s+', ' ', text)
         
-        return cleaned
+        # Suppression des espaces en début/fin
+        text = text.strip()
+        
+        return text
     
-    def get_embedding_info(self) -> Dict[str, Any]:
+    def generate_embedding(self, text: str) -> np.ndarray:
         """
-        Retourne des informations sur le modèle d'embedding.
+        Génère un embedding pour un texte donné.
+        
+        Args:
+            text (str): Texte à encoder
+            
+        Returns:
+            np.ndarray: Embedding du texte (vecteur de features normalisé)
+        """
+        # Nettoyage et préparation du texte
+        cleaned_text = self._clean_text(text)
+        
+        if not cleaned_text.strip():
+            raise ValueError("Le texte d'entrée est vide après nettoyage.")
+        
+        try:
+            # Génération de l'embedding avec Sentence Transformers
+            # Le modèle gère automatiquement la tokenisation, l'encodage et la normalisation
+            embedding = self.model.encode(
+                cleaned_text,
+                convert_to_numpy=True,
+                normalize_embeddings=True  # Normalisation automatique
+            )
+            
+            return embedding
+            
+        except Exception as e:
+            print(f"❌ Erreur lors de la génération de l'embedding: {e}")
+            raise RuntimeError(f"Impossible de générer l'embedding pour le texte: {str(e)}")
+    
+    def generate_embeddings_batch(self, texts: List[str]) -> np.ndarray:
+        """
+        Génère des embeddings pour une liste de textes (traitement par batch pour de meilleures performances).
+        
+        Args:
+            texts (List[str]): Liste de textes à encoder
+            
+        Returns:
+            np.ndarray: Array des embeddings (shape: [n_texts, embedding_dim])
+        """
+        if not texts:
+            raise ValueError("La liste de textes est vide.")
+        
+        # Nettoyage de tous les textes
+        cleaned_texts = [self._clean_text(text) for text in texts]
+        
+        # Vérification que tous les textes ne sont pas vides
+        if all(not text.strip() for text in cleaned_texts):
+            raise ValueError("Tous les textes sont vides après nettoyage.")
+        
+        try:
+            # Génération des embeddings par batch
+            embeddings = self.model.encode(
+                cleaned_texts,
+                convert_to_numpy=True,
+                normalize_embeddings=True,
+                batch_size=32,  # Ajustable selon la mémoire disponible
+                show_progress_bar=len(texts) > 10  # Progress bar pour les gros batches
+            )
+            
+            return embeddings
+            
+        except Exception as e:
+            print(f"❌ Erreur lors de la génération des embeddings par batch: {e}")
+            raise RuntimeError(f"Impossible de générer les embeddings: {str(e)}")
+    
+    def compute_similarity(self, text1: str, text2: str) -> float:
+        """
+        Calcule la similarité cosinus entre deux textes.
+        
+        Args:
+            text1 (str): Premier texte
+            text2 (str): Deuxième texte
+            
+        Returns:
+            float: Score de similarité entre -1 et 1
+        """
+        try:
+            # Génération des embeddings pour les deux textes
+            embeddings = self.generate_embeddings_batch([text1, text2])
+            
+            # Calcul de la similarité cosinus
+            # (Les embeddings sont déjà normalisés, donc le produit scalaire = similarité cosinus)
+            similarity = np.dot(embeddings[0], embeddings[1])
+            
+            return float(similarity)
+            
+        except Exception as e:
+            print(f"❌ Erreur lors du calcul de similarité: {e}")
+            raise RuntimeError(f"Impossible de calculer la similarité: {str(e)}")
+    
+    def compute_similarity_matrix(self, texts: List[str]) -> np.ndarray:
+        """
+        Calcule la matrice de similarité pour une liste de textes.
+        
+        Args:
+            texts (List[str]): Liste de textes
+            
+        Returns:
+            np.ndarray: Matrice de similarité (shape: [n_texts, n_texts])
+        """
+        if len(texts) < 2:
+            raise ValueError("Il faut au moins 2 textes pour calculer une matrice de similarité.")
+        
+        try:
+            # Génération de tous les embeddings
+            embeddings = self.generate_embeddings_batch(texts)
+            
+            # Calcul de la matrice de similarité (produit matriciel)
+            similarity_matrix = np.dot(embeddings, embeddings.T)
+            
+            return similarity_matrix
+            
+        except Exception as e:
+            print(f"❌ Erreur lors du calcul de la matrice de similarité: {e}")
+            raise RuntimeError(f"Impossible de calculer la matrice de similarité: {str(e)}")
+    
+    def get_model_info(self) -> dict:
+        """
+        Retourne des informations sur le modèle utilisé.
         
         Returns:
-            Dict[str, Any]: Informations sur le modèle
+            dict: Informations sur le modèle
         """
         return {
-            "model_name": self.model.config.name_or_path if hasattr(self.model, 'config') else "Unknown",
-            "embedding_dim": self.model.config.hidden_size if hasattr(self.model, 'config') else "Unknown",
-            "device": str(self.device),
-            "vocab_size": len(self.tokenizer) if self.tokenizer else "Unknown"
+            "model_name": self.model._modules['0'].auto_model.config.name_or_path,
+            "embedding_dimension": self.model.get_sentence_embedding_dimension(),
+            "max_sequence_length": self.model.max_seq_length,
+            "device": str(self.device)
         }
+
+
+# Test local du module
+if __name__ == "__main__":
+    import time
+    
+    print("🧪 Test du gestionnaire d'embeddings avec Sentence Transformers")
+    
+    # Initialisation du gestionnaire
+    print("\n📥 Chargement du modèle d'embeddings...")
+    manager = EmbeddingManager()
+    
+    # Informations sur le modèle
+    info = manager.get_model_info()
+    print("\n📊 Informations sur le modèle:")
+    for key, value in info.items():
+        print(f"  • {key}: {value}")
+    
+    # Test de génération d'embeddings individuels
+    test_texts = [
+        "Avancer à pleine vitesse",
+        "Tourne à droite rapidement", 
+        "Allume les LED en bleu",
+        "Recule en arrière"
+    ]
+    
+    print("\n🔢 Test de génération d'embeddings individuels:")
+    embeddings_individual = []
+    
+    for text in test_texts:
+        print(f"\n  • Texte: '{text}'")
+        
+        # Mesure du temps d'exécution
+        start_time = time.time()
+        embedding = manager.generate_embedding(text)
+        end_time = time.time()
+        duration = end_time - start_time
+        
+        embeddings_individual.append(embedding)
+        
+        print(f"    Dimension: {embedding.shape}")
+        print(f"    Norme: {np.linalg.norm(embedding):.4f}")
+        print(f"    Premiers éléments: {embedding[:3]}...")
+        print(f"    Temps: {duration:.3f}s")
+    
+    # Test de génération par lot (plus efficace)
+    print("\n🚀 Test de génération d'embeddings par lot:")
+    start_time = time.time()
+    batch_embeddings = manager.generate_embeddings_batch(test_texts)
+    end_time = time.time()
+    batch_duration = end_time - start_time
+    
+    print(f"  • Nombre d'embeddings générés: {len(batch_embeddings)}")
+    print(f"  • Forme du batch: {batch_embeddings.shape}")
+    print(f"  • Temps total pour le batch: {batch_duration:.3f}s")
+    print(f"  • Temps moyen par embedding: {batch_duration/len(test_texts):.3f}s")
+    
+    # Test de similarité avec la méthode intégrée
+    print("\n🔍 Test de similarité entre textes (méthode intégrée):")
+    for i in range(len(test_texts)):
+        for j in range(i+1, len(test_texts)):
+            similarity = manager.compute_similarity(test_texts[i], test_texts[j])
+            print(f"  • '{test_texts[i]}' vs '{test_texts[j]}': {similarity:.4f}")
+    
+    # Test de la matrice de similarité complète
+    print("\n🔍 Test de matrice de similarité complète:")
+    similarity_matrix = manager.compute_similarity_matrix(test_texts)
+    print(f"  • Forme de la matrice: {similarity_matrix.shape}")
+    print("  • Matrice de similarité:")
+    
+    # Affichage formaté de la matrice
+    print("    ", end="")
+    for i, text in enumerate(test_texts):
+        print(f"{i:>8}", end="")
+    print()
+    
+    for i, text in enumerate(test_texts):
+        print(f"{i}: ", end="")
+        for j in range(len(test_texts)):
+            print(f"{similarity_matrix[i,j]:>8.4f}", end="")
+        print(f"  ({text[:25]}...)" if len(text) > 25 else f"  ({text})")
+    
+
+    
+    # Test avec des phrases plus variées pour vérifier la discrimination
+    print("\n🎯 Test de discrimination avec des phrases plus variées:")
+    varied_texts = [
+        "Avancer tout droit rapidement",  # Similar to "Avancer à pleine vitesse"
+        "Marcher lentement vers l'avant",  # Similar concept, different intensity
+        "Éteindre toutes les lumières",    # Different domain
+        "Calculer la racine carrée de 64"  # Completely different domain
+    ]
+    
+    reference_text = "Avancer à pleine vitesse"
+    print(f"  Référence: '{reference_text}'")
+    
+    for text in varied_texts:
+        similarity = manager.compute_similarity(reference_text, text)
+        print(f"  • vs '{text}': {similarity:.4f}")
+    
+    print("\n✅ Test terminé! ")
