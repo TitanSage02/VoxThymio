@@ -1,26 +1,26 @@
 {
     "avancer": {
         "code": "motor.left.target = 200\nmotor.right.target = 200",
-        "description": "Fait avancer le robot vers l'avant."
+        "description": "avancer"
     },
     
     "reculer": {
         "code": "motor.left.target = -200\nmotor.right.target = -200",
-        "description": "Fait reculer le robot vers l'arrière."
+        "description": "reculer"
     },
     
     "arreter": {
         "code": "motor.left.target = 0\nmotor.right.target = 0",
-        "description": "Arrête le robot."
+        "description": "arrêter"
     },
     
     "tourner_gauche": {
         "code": "motor.left.target = -100\nmotor.right.target = 100",
-        "description": "Fait tourner le robot vers la gauche."
+        "description": "tourner à gauche."
     },
     
     "tourner_droite": {
         "code": "motor.left.target = 100\nmotor.right.target = -100",
-        "description": "Fait tourner le robot vers la droite."
+        "description": "tourner à droite."
     }
 }
