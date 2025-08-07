@@ -308,7 +308,7 @@ class VoxThymioGUI:
         title_label.pack()
         
         subtitle = ttk.Label(title_frame, 
-                            text="// CONTRÔLE VOCAL INTELLIGENT //",
+                            text="\\ CONTRÔLE VOCAL INTELLIGENT //",
                             style="Cyber.Status.TLabel")
         subtitle.pack()
         
@@ -317,12 +317,12 @@ class VoxThymioGUI:
         dev_frame.pack(side="right")
         
         dev_label = ttk.Label(dev_frame, 
-                             text=f"DEV: {app_config['developer']}",
+                             text=f"{app_config['developer']}",
                              style="Cyber.Info.TLabel")
         dev_label.pack(anchor="e")
         
         org_label = ttk.Label(dev_frame, 
-                             text=f"ORG: {app_config['organization']}",
+                             text=f"{app_config['organization']}",
                              style="Cyber.Header.TLabel")
         org_label.pack(anchor="e")
         
