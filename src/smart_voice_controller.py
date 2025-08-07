@@ -1,29 +1,27 @@
 """
-Nouveau contrôleur vocal utilisant BERT français et la recherche de similarité
-pour VoxThymio. Permet d'ajouter dynamiquement des commandes.
-
-Développé par Espérance AYIWAHOUN pour AI4Innov
+Contrôleur vocal pour VoxThymio permettant d'ajouter dynamiquement des commandes au système.
 """
 
 import asyncio
 import json
+import logging
 from typing import Dict, Any, Optional, List, Tuple
 from pathlib import Path
 
 from .embedding_manager import EmbeddingManager
 from .command_manager import VectorDatabase
-from .communication.thymio_controller import ThymioController
+from .controller.thymio_controller import ThymioController
+from .speech_recognizer import SpeechRecognizer
 
 
 class SmartVoiceController:
     """
-    Contrôleur vocal intelligent utilisant des embeddings BERT français
-    pour la compréhension et l'exécution de commandes.
+    Contrôleur vocal pour la compréhension et l'exécution de commandes.
     """
     
     def __init__(self, thymio_controller: ThymioController):
         """
-        Initialise le contrôleur vocal intelligent.
+        Initialise le contrôleur vocal.
         
         Args:
             thymio_controller (ThymioController): Contrôleur de communication avec Thymio
@@ -31,9 +29,13 @@ class SmartVoiceController:
         self.thymio_controller = thymio_controller
         
         # Gestionnaires
-        print("🔧 Initialisation du système intelligent...")
+        print("🔧 Initialisation du système...")
         self.embedding_manager = EmbeddingManager()
         self.vector_db = VectorDatabase()
+        
+        # Reconnaissance vocale
+        self.speech_recognizer = SpeechRecognizer(language="fr-FR")
+        self.is_voice_active = False
         
         # Configuration des seuils
         self.EXECUTION_THRESHOLD = 0.6   # Seuil pour exécuter une commande
@@ -43,21 +45,22 @@ class SmartVoiceController:
         self.is_learning_mode = False
         self.pending_command = None
         
-        # Initialisation avec les commandes de base
-        self._load_default_commands()
-        
-        print("✅ Système vocal intelligent initialisé.")
-    
-    async def process_voice_command(self, user_input: str) -> Dict[str, Any]:
+        # Initialisation avec les commandes en mémoire
+        self._load_commands()
+
+        print("✅ Système initialisé.")
+
+    async def process_command(self, user_input: str) -> Dict[str, Any]:
         """
-        Traite une commande vocale et retourne le résultat.
-        
+        Traite une commande textuelle et retourne le résultat.
+
         Args:
-            user_input (str): Commande vocale de l'utilisateur
-            
+            user_input (str): Commande textuelle de l'utilisateur
+
         Returns:
             Dict[str, Any]: Résultat du traitement
         """
+        # Vérification de la validité de la commande
         if not user_input or not user_input.strip():
             return {
                 'status': 'error',
@@ -65,7 +68,7 @@ class SmartVoiceController:
                 'action': 'none'
             }
         
-        print(f"🎤 Traitement de: '{user_input}'")
+        print(f"Traitement de: '{user_input}'")
         
         try:
             # Génération de l'embedding de la requête
@@ -80,6 +83,17 @@ class SmartVoiceController:
             if best_match:
                 similarity = best_match['similarity']
                 
+                # Si seuil d'appprentissage atteint
+                if similarity >= self.LEARNING_THRESHOLD and self.is_learning_mode:
+                    print(f"🔍 Apprentissage de la commande: '{user_input}' (similarité: {similarity:.2f})")
+                    
+                    # Ajout de la nouvelle commande
+                    self.add_new_command(
+                        command_id=f"custom_{len(self.vector_db.get_all_commands()) + 1}",
+                        description=user_input,
+                        code=self.pending_command or "motor.left.target = 0\nmotor.right.target = 0"
+                    )
+
                 # Exécution directe si seuil atteint
                 if similarity >= self.EXECUTION_THRESHOLD:
                     return await self._execute_command(best_match, similarity)
@@ -174,8 +188,7 @@ class SmartVoiceController:
             'message': message,
             'action': 'suggest',
             'user_input': user_input,
-            'suggestions': suggestions,
-            'embedding': query_embedding.tolist()  # Pour une éventuelle utilisation future
+            'suggestions': suggestions
         }
     
     def add_new_command(self, command_id: str, description: str, 
@@ -204,37 +217,16 @@ class SmartVoiceController:
             )
             
             if similar_commands and similar_commands[0]['similarity'] > 0.9:
-                return {
-                    'status': 'warning',
-                    'message': f'Une commande très similaire existe déjà: "{similar_commands[0]["description"]}"',
-                    'action': 'conflict',
-                    'similar_command': similar_commands[0]
-                }
+                print(f"⚠️ Commande similaire trouvée: {similar_commands[0]['description']} (ID: {similar_commands[0]['command_id']})")
             
             # Ajout à la base vectorielle
             if self.vector_db.add_command(command_id, description, code, embedding, category):
-                return {
-                    'status': 'success',
-                    'message': f'Commande "{command_id}" ajoutée avec succès.',
-                    'action': 'added',
-                    'command_id': command_id,
-                    'description': description,
-                    'similar_commands': similar_commands[:2]  # Afficher quelques commandes similaires
-                }
+               print(f"✅ Commande '{command_id}' ajoutée avec succès.")
             else:
-                return {
-                    'status': 'error',
-                    'message': f'Échec de l\'ajout de la commande "{command_id}".',
-                    'action': 'failed'
-                }
-                
+                print(f"❌ Échec de l'ajout de la commande '{command_id}'.")    
         except Exception as e:
-            return {
-                'status': 'error',
-                'message': f'Erreur lors de l\'ajout: {str(e)}',
-                'action': 'error'
-            }
-    
+            print(f"❌ Erreur lors de l'ajout de la commande '{command_id}': {e}")
+
     def get_all_commands(self) -> List[Dict[str, Any]]:
         """
         Récupère toutes les commandes disponibles.
@@ -286,64 +278,33 @@ class SmartVoiceController:
             }
         }
     
-    def _load_default_commands(self):
+    def _load_commands(self):
         """
-        Charge les commandes par défaut depuis commands.json.
+        Charge les commandes depuis commands.json.
         """
         commands_file = Path(__file__).parent.parent / "commands.json"
         
         if not commands_file.exists():
-            print("⚠️ Fichier commands.json non trouvé. Aucune commande par défaut chargée.")
+            print("⚠️ Fichier commands.json non trouvé. Aucune commande chargée.")
             return
         
         try:
             with open(commands_file, 'r', encoding='utf-8') as f:
-                default_commands = json.load(f)
-            
-            # Descriptions en français pour les commandes de base
-            descriptions = {
-                "avancer": "faire avancer le robot vers l'avant",
-                "avancer_lent": "avancer lentement vers l'avant",
-                "avancer_rapide": "avancer rapidement vers l'avant",
-                "reculer": "faire reculer le robot vers l'arrière",
-                "reculer_lent": "reculer lentement vers l'arrière",
-                "reculer_rapide": "reculer rapidement vers l'arrière",
-                "arreter": "arrêter le robot complètement",
-                "tourner_gauche": "tourner vers la gauche",
-                "tourner_droite": "tourner vers la droite",
-                "tourner_gauche_lent": "tourner lentement vers la gauche",
-                "tourner_droite_lent": "tourner lentement vers la droite",
-                "led_rouge": "allumer la LED en rouge",
-                "led_vert": "allumer la LED en vert",
-                "led_bleu": "allumer la LED en bleu",
-                "led_jaune": "allumer la LED en jaune",
-                "led_violet": "allumer la LED en violet",
-                "led_blanc": "allumer la LED en blanc",
-                "led_eteindre": "éteindre toutes les LEDs",
-                "son_heureux": "jouer un son joyeux",
-                "son_triste": "jouer un son triste",
-                "son_silence": "arrêter tous les sons",
-                "volume_max": "mettre le volume au maximum",
-                "volume_moyen": "mettre le volume moyen",
-                "volume_bas": "mettre le volume bas",
-                "note_do": "jouer la note Do",
-                "note_re": "jouer la note Ré",
-                "note_mi": "jouer la note Mi",
-                "note_fa": "jouer la note Fa",
-                "note_sol": "jouer la note Sol"
-            }
-            
+                commands = json.load(f)
+
+
             added_count = 0
-            for cmd_id, code in default_commands.items():
-                description = descriptions.get(cmd_id, f"commande {cmd_id}")
-                
+            for cmd_id, cmd_info in commands.items():
+                description = cmd_info["description"]
+                code = cmd_info["code"]
+
                 # Vérifier si la commande existe déjà
                 if not self.vector_db.command_exists(cmd_id):
                     embedding = self.embedding_manager.generate_embedding(description)
                     if self.vector_db.add_command(cmd_id, description, code, embedding, "default"):
                         added_count += 1
             
-            print(f"✅ {added_count} commandes par défaut ajoutées à la base vectorielle.")
+            print(f"✅ {added_count} commandes chargées depuis {commands_file}.")
             
         except Exception as e:
             print(f"❌ Erreur lors du chargement des commandes par défaut: {e}")
@@ -386,3 +347,192 @@ class SmartVoiceController:
                 'learning': self.LEARNING_THRESHOLD
             }
         }
+    
+    # --- Méthodes pour la reconnaissance vocale ---
+    
+    def start_voice_recognition(self, callback=None) -> Dict[str, Any]:
+        """
+        Démarre la reconnaissance vocale en continu.
+        
+        Args:
+            callback: Fonction à appeler pour chaque commande reconnue
+            
+        Returns:
+            Dict[str, Any]: Résultat du démarrage
+        """
+        if self.is_voice_active:
+            return {
+                'status': 'warning',
+                'message': 'La reconnaissance vocale est déjà active'
+            }
+        
+        try:
+            # Si aucun callback n'est fourni, on utilise le traitement standard
+            if callback is None:
+                callback = self._on_voice_command_recognized
+                
+            # Démarrage de l'écoute
+            if self.speech_recognizer.start_listening(callback=callback):
+                self.is_voice_active = True
+                return {
+                    'status': 'success',
+                    'message': '🎤 Reconnaissance vocale activée',
+                    'action': 'voice_started'
+                }
+            else:
+                return {
+                    'status': 'error',
+                    'message': '❌ Échec de l\'activation de la reconnaissance vocale',
+                    'action': 'voice_failed'
+                }
+                
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f'Erreur lors de l\'activation: {str(e)}',
+                'action': 'voice_error'
+            }
+    
+    def stop_voice_recognition(self) -> Dict[str, Any]:
+        """
+        Arrête la reconnaissance vocale.
+        
+        Returns:
+            Dict[str, Any]: Résultat de l'arrêt
+        """
+        if not self.is_voice_active:
+            return {
+                'status': 'warning',
+                'message': 'La reconnaissance vocale n\'est pas active'
+            }
+        
+        try:
+            if self.speech_recognizer.stop_listening():
+                self.is_voice_active = False
+                return {
+                    'status': 'success',
+                    'message': '🎤 Reconnaissance vocale désactivée',
+                    'action': 'voice_stopped'
+                }
+            else:
+                return {
+                    'status': 'error',
+                    'message': '❌ Échec de la désactivation',
+                    'action': 'voice_stop_failed'
+                }
+                
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f'Erreur lors de la désactivation: {str(e)}',
+                'action': 'voice_error'
+            }
+    
+    def calibrate_microphone(self, duration: float = 2.0) -> Dict[str, Any]:
+        """
+        Calibre le microphone pour la reconnaissance vocale.
+        
+        Args:
+            duration (float): Durée de la calibration en secondes
+            
+        Returns:
+            Dict[str, Any]: Résultat de la calibration
+        """
+        try:
+            result = self.speech_recognizer.calibrate_mic(duration=duration)
+            
+            if result['status'] == 'success':
+                return {
+                    'status': 'success',
+                    'message': f'🎤 Microphone calibré avec succès (seuil: {result["after_threshold"]})',
+                    'calibration': result
+                }
+            else:
+                return {
+                    'status': 'error',
+                    'message': f'❌ Échec de la calibration: {result["message"]}',
+                    'error': result['message']
+                }
+                
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f'Erreur lors de la calibration: {str(e)}',
+                'error': str(e)
+            }
+    
+    def get_voice_recognition_stats(self) -> Dict[str, Any]:
+        """
+        Récupère les statistiques de reconnaissance vocale.
+        
+        Returns:
+            Dict[str, Any]: Statistiques de reconnaissance
+        """
+        try:
+            stats = self.speech_recognizer.get_stats()
+            return {
+                'status': 'success',
+                'message': 'Statistiques récupérées',
+                'stats': stats,
+                'is_active': self.is_voice_active
+            }
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f'Erreur lors de la récupération des statistiques: {str(e)}'
+            }
+    
+    def update_speech_settings(self, energy_threshold: Optional[int] = None, 
+                              pause_threshold: Optional[float] = None,
+                              language: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Met à jour les paramètres de reconnaissance vocale.
+        
+        Args:
+            energy_threshold (int): Seuil d'énergie pour la détection de son
+            pause_threshold (float): Durée de pause considérée comme fin de phrase
+            language (str): Code de langue (ex: 'fr-FR')
+            
+        Returns:
+            Dict[str, Any]: Résultat de la mise à jour
+        """
+        try:
+            result = self.speech_recognizer.update_settings(
+                energy_threshold=energy_threshold,
+                pause_threshold=pause_threshold,
+                language=language
+            )
+            
+            return {
+                'status': 'success',
+                'message': 'Paramètres mis à jour avec succès',
+                'settings': result['current_settings']
+            }
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': f'Erreur lors de la mise à jour des paramètres: {str(e)}'
+            }
+    
+    async def _on_voice_command_recognized(self, text: str):
+        """
+        Callback appelé lorsqu'une commande vocale est reconnue.
+        
+        Args:
+            text (str): Texte reconnu
+        """
+        if not text:
+            return
+            
+        print(f"🎤 Commande vocale reconnue: '{text}'")
+        
+        # Traitement asynchrone de la commande
+        result = await self.process_command(text)
+        
+        # Affichage du résultat (peut être personnalisé selon l'interface)
+        if result['status'] == 'success':
+            print(f"✅ {result['message']}")
+        elif result['status'] == 'unknown':
+            print(f"❓ {result['message']}")
+        else:
+            print(f"❌ {result['message']}")

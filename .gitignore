@@ -1,8 +1,133 @@
-__pycache__/
-build/
-node_modules/
-dist/
+# VoxThymio Intelligence - Fichiers à ignorer
+# Développé par [Votre Nom] pour AI4Innov
 
+# ===== FICHIERS PYTHON =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ===== ENVIRONNEMENTS VIRTUELS =====
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ===== DONNÉES ET MODÈLES =====
+# Base de données vectorielle (garder la structure, ignorer les données)
+vector_db/*.sqlite3
+vector_db/*/
+
+# Modèles BERT téléchargés (très volumineux)
+models/
+*.model
+*.safetensors
+*.bin
+*.pkl
+
+# ===== LOGS ET DONNÉES TEMPORAIRES =====
+logs/*.log
+logs/*.txt
+temp/
+*.tmp
+*.temp
+
+# ===== EXPORTS ET SAUVEGARDES =====
+exports/*.json
+exports/*.csv
+backups/
+*.backup
+deployment_report_*.json
+
+# ===== CONFIGURATION LOCALE =====
+.env.local
+.env.development
+.env.test
+config_local.json
+
+# ===== IDE ET ÉDITEURS =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ===== SYSTÈME D'EXPLOITATION =====
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.nfs*
+
+# ===== TESTS ET DÉVELOPPEMENT =====
+.pytest_cache/
+.coverage
+.nyc_output
+coverage.xml
+*.cover
+.hypothesis/
+.tox/
+
+# ===== ANCIENNES VERSIONS =====
+# Le dossier old/ est versionné pour archivage
+# mais on ignore les sous-dossiers de cache
+old/**/__pycache__/
+old/**/*.pyc
+
+# ===== FICHIERS COMPRESSÉS =====
 *.zip
 *.tar.gz
-models/
+*.rar
+*.7z
+
+# ===== FICHIERS SYSTÈME =====
+node_modules/

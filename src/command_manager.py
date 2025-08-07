@@ -1,17 +1,13 @@
 """
 Gestionnaire de base vectorielle utilisant ChromaDB pour VoxThymio
 Stocke et gère les embeddings des commandes avec leurs métadonnées.
-
-Développé par Espérance AYIWAHOUN pour AI4Innov
 """
 
 import chromadb
 from chromadb.config import Settings
-import numpy as np
-from typing import List, Dict, Any, Tuple, Optional
-import json
-import os
+from typing import List, Dict, Any, Optional
 from pathlib import Path
+import numpy as np
 
 
 class VectorDatabase:
@@ -35,7 +31,7 @@ class VectorDatabase:
             path=str(self.db_path),
             settings=Settings(
                 anonymized_telemetry=False,
-                allow_reset=True
+                allow_reset=False
             )
         )
         
@@ -53,8 +49,7 @@ class VectorDatabase:
             print(f"✅ Collection '{self.collection_name}' créée.")
     
     def add_command(self, command_id: str, description: str, 
-                   code: str, embedding: np.ndarray, 
-                   category: str = "custom") -> bool:
+                   code: str, embedding: np.ndarray ) -> bool:
         """
         Ajoute une nouvelle commande à la base vectorielle.
         
@@ -63,7 +58,6 @@ class VectorDatabase:
             description (str): Description en langage naturel
             code (str): Code associé à la commande
             embedding (np.ndarray): Embedding de la description
-            category (str): Catégorie de la commande
             
         Returns:
             bool: True si ajouté avec succès, False sinon
@@ -72,7 +66,7 @@ class VectorDatabase:
             # Vérifier si la commande existe déjà
             if self.command_exists(command_id):
                 print(f"⚠️ La commande '{command_id}' existe déjà. Mise à jour...")
-                return self.update_command(command_id, description, code, embedding, category)
+                return self.update_command(command_id, description, code, embedding)
             
             # Convertir l'embedding en liste pour ChromaDB
             embedding_list = embedding.tolist() if isinstance(embedding, np.ndarray) else embedding
@@ -82,7 +76,6 @@ class VectorDatabase:
                 "command_id": command_id,
                 "description": description,
                 "code": code,
-                "category": category,
                 "created_at": str(np.datetime64('now'))
             }
             
@@ -139,9 +132,7 @@ class VectorDatabase:
                             'command_id': command_id,
                             'similarity': similarity,
                             'description': metadata.get('description', ''),
-                            'code': metadata.get('code', ''),
-                            'category': metadata.get('category', 'unknown'),
-                            'metadata': metadata
+                            'code': metadata.get('code', '')
                         })
             
             return similar_commands
@@ -244,9 +235,7 @@ class VectorDatabase:
                         'command_id': command_id,
                         'description': metadata.get('description', ''),
                         'code': metadata.get('code', ''),
-                        'category': metadata.get('category', 'unknown'),
                         'created_at': metadata.get('created_at', ''),
-                        'metadata': metadata
                     })
             
             return commands
@@ -264,15 +253,15 @@ class VectorDatabase:
         """
         try:
             commands = self.get_all_commands()
-            categories = {}
-            
-            for cmd in commands:
-                category = cmd.get('category', 'unknown')
-                categories[category] = categories.get(category, 0) + 1
-            
+            if not commands:
+                return {
+                    'total_commands': 0,
+                    'collection_name': self.collection_name,
+                    'db_path': str(self.db_path)
+                }
+                        
             return {
                 'total_commands': len(commands),
-                'categories': categories,
                 'collection_name': self.collection_name,
                 'db_path': str(self.db_path)
             }
