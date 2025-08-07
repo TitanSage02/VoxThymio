@@ -16,7 +16,7 @@ class EmbeddingManager:
     basées sur leurs embeddings.
     """
     
-    def __init__(self, db_path: str = "./vector_db"):
+    def __init__(self, db_path: str = "../../vector_db"):
         """
         Initialise la base vectorielle.
         
