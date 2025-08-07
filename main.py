@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 VoxThymio - Script de lancement principal
 Développé par Espérance AYIWAHOUN pour AI4Innov
