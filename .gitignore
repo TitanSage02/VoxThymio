@@ -1,5 +1,4 @@
-# VoxThymio Intelligence - Fichiers à ignorer
-# Développé par [Votre Nom] pour AI4Innov
+# VoxThymio - Fichiers à ignorer
 
 # ===== FICHIERS PYTHON =====
 __pycache__/
@@ -131,3 +130,6 @@ old/**/*.pyc
 
 # ===== FICHIERS SYSTÈME =====
 node_modules/
+
+
+/vector_db
