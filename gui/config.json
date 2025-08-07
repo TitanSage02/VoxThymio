@@ -1,0 +1,81 @@
+{
+    "application": {
+        "name": "VoxThymio",
+        "version": "1.0",
+        "developer": "Espérance AYIWAHOUN",
+        "organization": "AI4Innov"
+    },
+    "ui": {
+        "theme": "cyberpunk_hack",
+        "colors": {
+            "primary": "#00ff41",
+            "secondary": "#0d1117",
+            "background": "#010409",
+            "text_dark": "#c9d1d9",
+            "text_light": "#00ff41",
+            "success": "#39ff14",
+            "warning": "#ffaa00",
+            "danger": "#ff073a",
+            "accent": "#00d4ff",
+            "terminal": "#0a0e0a",
+            "card": "#161b22",
+            "border": "#21262d",
+            "hover": "#238636"
+        },
+        "window": {
+            "width": 1200,
+            "height": 800,
+            "min_width": 1000,
+            "min_height": 700,
+            "resizable": true
+        }
+    },
+    "voice": {
+        "default_language": "fr-FR",
+        "model_size": "small",
+        "energy_threshold": 300,
+        "pause_threshold": 0.8,
+        "execution_threshold": 0.29337539432176657,
+        "learning_threshold": 0.0
+    },
+    "thymio": {
+        "connection_timeout": 10,
+        "auto_reconnect": true,
+        "default_speed": 200
+    },
+    "commands": {
+        "auto_save": true,
+        "backup_interval": 300,
+        "max_custom_commands": 50
+    },
+    "templates": {
+        "movement": {
+            "name": "Mouvement simple",
+            "code": "motor.left.target = 200\nmotor.right.target = 200"
+        },
+        "rotation": {
+            "name": "Rotation",
+            "code": "motor.left.target = -100\nmotor.right.target = 100"
+        },
+        "stop": {
+            "name": "Arrêt",
+            "code": "motor.left.target = 0\nmotor.right.target = 0"
+        },
+        "sensors": {
+            "name": "Lecture Capteurs",
+            "code": "call prox.horizontal\nif prox.horizontal[2] > 1000 then\n  motor.left.target = 0\n  motor.right.target = 0\nend"
+        },
+        "leds": {
+            "name": "LEDs",
+            "code": "call leds.top(32, 32, 32)"
+        },
+        "sound": {
+            "name": "Son",
+            "code": "call sound.freq(440, 100)"
+        },
+        "timer": {
+            "name": "Temporisateur",
+            "code": "timer.period[0] = 1000"
+        }
+    }
+}
