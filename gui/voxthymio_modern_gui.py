@@ -94,15 +94,15 @@ class VoxThymioGUI:
                 "name": "VoxThymio",
                 "version": "1.0",
                 "developer": "Espérance AYIWAHOUN",
-                "organization": "AI4Innov - TechEduc"
+                "organization": "AI4Innov"
             },
             "ui": {
                 "colors": {
-                    "primary": "#00ff41",
+                    "primary": "#40ff70d3",
                     "secondary": "#ff0080", 
                     "background": "#0d1117",
-                    "panel": "#161b22",
-                    "text_primary": "#00ff41",
+                    "panel": "#ffffff",
+                    "text_primary": "#40ff70d3",
                     "text_secondary": "#ff0080",
                     "text_normal": "#c9d1d9",
                     "accent": "#00d4ff",
@@ -378,7 +378,7 @@ class VoxThymioGUI:
         
         # Boutons de mouvement avec grille cyberpunk
         movement_frame = tk.LabelFrame(frame, text=">> NAVIGATION <<", 
-                                      bg=colors['panel'], fg=colors['secondary'],
+                                      bg=colors['panel'], fg=colors['accent'], 
                                       font=("Consolas", 9, "bold"))
         movement_frame.pack(fill="x", padx=10, pady=6)
         
@@ -403,7 +403,7 @@ class VoxThymioGUI:
         
         ttk.Button(btn_grid, text="⏹ ARRÊT", 
                   command=lambda: self.manual_command("arreter"),
-                  style="Cyber.Secondary.TButton").grid(row=1, column=1, padx=3, pady=3, 
+                  style="Cyber.Disabled.TButton").grid(row=1, column=1, padx=3, pady=3, 
                                              sticky="ew", ipadx=10, ipady=5)
         
         ttk.Button(btn_grid, text="➡ DROITE", 
@@ -419,7 +419,7 @@ class VoxThymioGUI:
         
         # Contrôles LED cyberpunk
         led_frame = tk.LabelFrame(frame, text=">> ÉCLAIRAGE LED <<", 
-                                 bg=colors['panel'], fg=colors['secondary'],
+                                 bg=colors['panel'], fg=colors['accent'], 
                                  font=("Consolas", 9, "bold"))
         led_frame.pack(fill="x", padx=10, pady=6)
         
@@ -496,7 +496,7 @@ class VoxThymioGUI:
         
         # Fenêtre de dialogue cyberpunk
         dialog = tk.Toplevel(self.root)
-        dialog.title("⚡ Nouvelle Commande Personnalisée")
+        dialog.title("⚡ Nouvelle commande personnalisée")
         dialog.geometry("550x500")
         dialog.configure(bg=colors['background'])
         dialog.resizable(False, False)
@@ -530,7 +530,7 @@ class VoxThymioGUI:
         name_entry.pack(fill="x", pady=(0, 15), ipady=8)
         
         # Description de la commande
-        tk.Label(main_container, text="Description (pour reconnaissance vocale):",
+        tk.Label(main_container, text="Description de la commande:",
                 bg=colors['background'], fg=colors['text_normal'],
                 font=("Consolas", 11, "bold")).pack(anchor="w", pady=(0, 5))
         
@@ -540,7 +540,7 @@ class VoxThymioGUI:
         description_entry.pack(fill="x", pady=(0, 15), ipady=8)
         
         # Code Aseba
-        tk.Label(main_container, text="Code Aseba (obligatoire):",
+        tk.Label(main_container, text="Code Aseba:",
                 bg=colors['background'], fg=colors['accent'],
                 font=("Consolas", 11, "bold")).pack(anchor="w", pady=(0, 5))
         
@@ -723,13 +723,13 @@ class VoxThymioGUI:
         # Bouton vocal principal cyberpunk
         self.voice_btn = ttk.Button(frame, 
                                    text="🎤 ACTIVER MODE VOCAL",
-                                   style="Cyber.Secondary.TButton",
+                                   style="Cyber.Primary.TButton",
                                    command=self.toggle_voice_mode)
         self.voice_btn.pack(pady=20, padx=20, fill="x", ipady=12)
         
         # Zone de commandes vocales cyberpunk
         commands_frame = tk.LabelFrame(frame, text=">> COMMANDES DISPONIBLES <<", 
-                                      bg=colors['panel'], fg=colors['secondary'],
+                                      bg=colors['panel'], fg=colors['accent'], 
                                       font=("Consolas", 9, "bold"))
         commands_frame.pack(fill="x", padx=10, pady=8)
         
