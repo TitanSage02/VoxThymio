@@ -18,10 +18,5 @@
   "tourner_droite": {
     "code": "motor.left.target = 100\nmotor.right.target = -100",
     "description": "tourner à droite."
-  },
-  "faire un carré": {
-    "description": "faire un carré",
-    "code": "robot carré",
-    "custom": true
   }
 }
