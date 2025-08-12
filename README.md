@@ -1,4 +1,4 @@
-# 🤖 VoxThymio – Contrôle intelligent du robot Thymio
+# VoxThymio 🤖🎤
 
 > **Système avancé de contrôle vocal et manuel pour robot Thymio**  
 > Développé par **Espérance AYIWAHOUN** pour **AI4Innov**
@@ -10,228 +10,255 @@
 ![BERT](https://img.shields.io/badge/NLP-BERT-yellow?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-## 📋 Sommaire
+**Contrôle Vocal Intelligent pour Robot Thymio avec IA**
 
-- [Présentation](#-présentation)
-- [Fonctionnalités](#-fonctionnalités)
-- [Configuration requise](#-configuration-requise)
-- [Installation](#-installation)
-- [Modes d'utilisation](#-modes-dutilisation)
-  - [Mode manuel (clavier)](#mode-manuel-clavier)
-  - [Mode vocal (IA)](#mode-vocal-ia)
-- [Pipeline de traitement vocal](#-pipeline-de-traitement-vocal)
-- [Architecture technique](#-architecture-technique)
-- [Personnalisation](#-personnalisation)
-- [Dépannage](#-dépannage)
-- [Licence](#-licence)
+VoxThymio est un système avancé de contrôle vocal pour robots Thymio qui utilise l'intelligence artificielle pour comprendre et exécuter des commandes en langage naturel. Le système apprend dynamiquement de nouvelles commandes et offre une interface intuitive pour contrôler votre robot Thymio par la voix.
 
-## ✨ Présentation
+[🇬🇧 English Version](./README_EN.md)
 
-**VoxThymio** est un système avancé de contrôle du robot éducatif Thymio, qui intègre deux modes complémentaires :
+## ✨ Caractéristiques principales
 
-- **Mode manuel** : contrôle précis via clavier
-- **Mode vocal** : contrôle par la voix grâce à l'intelligence artificielle
+- **🎤 Reconnaissance vocale en temps réel** - Support multimodal avec Whisper et SpeechRecognition
+- **🧠 Compréhension sémantique** - Utilise des embeddings multilingues pour comprendre les variations de commandes
+- **📚 Apprentissage dynamique** - Ajoute automatiquement de nouvelles commandes basées sur la similarité sémantique
+- **🔍 Recherche vectorielle** - Base de données ChromaDB pour une recherche efficace de commandes similaires
+- **🤖 Contrôle Thymio natif** - Communication directe avec le robot via tdmclient
+- **⚙️ Seuils configurables** - Ajustement fin des seuils d'exécution et d'apprentissage
 
-Cette version exploite un modèle BERT de classification d'intention pour interpréter intelligemment les commandes vocales en français, offrant une expérience utilisateur naturelle et intuitive.
-
-## 🚀 Fonctionnalités
-
-- **Interface de contrôle unifiée** :
-  - Mode manuel (contrôle clavier)
-  - Mode vocal (contrôle par la voix)
-
-- **Pipeline IA complet** :
-  - 🎤 Capture audio via microphone
-  - 📝 Transcription vocale (Speech-to-Text)
-  - 🧠 Classification d'intention avec BERT
-  - 🤖 Exécution de commande sur Thymio
-
-- **Expérience utilisateur optimisée** :
-  - Interface console claire et colorée
-  - Retour visuel sur chaque étape du processus
-  - Organisation des commandes par catégorie
-
-- **Système robuste** :
-  - Gestion des erreurs et timeouts
-  - Calibration automatique du microphone
-  - Communication asynchrone avec Thymio
-
-## 🖥️ Configuration requise
-
-- **Python** ≥ 3.8
-- **Thymio** (connecté ou emulé avec Thymio Suite)
-- **Microphone** (intégré ou externe)
-- **Hardware recommandé** :
-  - CPU : Core i3 ou équivalent
-  - RAM : 4GB minimum (8GB recommandé)
-  - Stockage : 500MB d'espace libre
-
-## ⚡ Installation
-
-1. **Clonez le dépôt et placez-vous dans le dossier `v2`**
-   ```bash
-   git clone https://github.com/AI4Innov/VoxThymio.git
-   cd VoxThymio/v2
-   ```
-
-2. **Créez un environnement virtuel (recommandé)**
-   ```bash
-   python -m venv venv
-   # Sur Windows
-   venv\Scripts\activate
-   # Sur macOS/Linux
-   source venv/bin/activate
-   ```
-
-3. **Installez les dépendances**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Préparez le robot Thymio**
-   - Lancez Thymio Suite
-   - Connectez un robot Thymio physique ou utilisez le simulateur
-
-5. **Exécutez l'application**
-   ```bash
-   python main.py
-   ```
-
-## 🕹️ Modes d'utilisation
-
-### Mode manuel (clavier)
-
-Le mode manuel permet un contrôle précis du robot via le clavier :
-
-1. Lorsque l'application démarre, vous êtes par défaut en mode manuel
-2. Utilisez les numéros affichés pour exécuter les commandes :
-   - Exemple : tapez `1` pour exécuter la commande "avancer"
-3. Commandes système :
-   - `v` : Passer en mode vocal
-   - `l` : Afficher toutes les commandes disponibles
-   - `0` : Quitter l'application
-
-### Mode vocal (IA)
-
-Le mode vocal utilise l'IA pour interpréter vos commandes vocales :
-
-1. Depuis le mode manuel, tapez `v` pour activer le mode vocal
-2. Attendez le signal d'écoute ("Écoute en cours...")
-3. Énoncez clairement votre commande (ex: "Avance", "Tourne à gauche", "Allume la LED rouge")
-4. Le système :
-   - Capture votre voix
-   - Transcrit la parole en texte
-   - Analyse l'intention avec BERT
-   - Exécute la commande correspondante sur le robot
-5. Pour revenir au mode manuel, dites "Quitter" ou attendez un timeout
-
-## 🔄 Pipeline de traitement vocal
-
-Le traitement d'une commande vocale suit le pipeline suivant :
-
-1. **Capture audio** 
-   - Via le microphone avec calibration automatique
-   - Gestion des timeouts et du bruit ambiant
-
-2. **Transcription vocale**
-   - Conversion parole → texte via Whisper (local, sans connexion Internet)
-   - Support du français et haute précision
-   - Fonctionnement entièrement hors ligne
-
-3. **Classification d'intention par BERT**
-   - Analyse du texte avec modèle BERT pré-entraîné
-   - Identification directe de la commande à exécuter
-   - Le modèle a été entraîné pour reconnaître les commandes dans `commands.json`
-
-4. **Vérification et exécution**
-   - Vérification que la commande identifiée existe
-   - Exécution du code Aseba associé à la commande
-   - Retour d'état de l'exécution
-
-> 💡 **Note technique** : Contrairement aux systèmes traditionnels qui nécessitent un mappage manuel entre les phrases reconnues et les commandes, notre modèle BERT a été directement entraîné pour prédire les commandes exactes utilisées dans `commands.json`.
-
-## 🛠️ Architecture technique
+## 🏗️ Architecture
 
 ```
-v2/
-├── main.py                        # Point d'entrée et interface utilisateur
-├── commands.json                  # Définition des commandes Thymio (personnalisable)
-├── requirements.txt               # Dépendances Python
-│
-├── src/                           # Code source principal
-│   ├── __init__.py
-│   ├── voice_controller.py        # Contrôleur vocal & pipeline de traitement
-│   ├── intent_classifier.py       # Classificateur d'intention BERT
-│   │
-│   └── communication/             # Communication avec le robot
-│       ├── __init__.py
-│       └── thymio_controller.py   # Contrôleur Thymio (via tdmclient)
-│
-├── models/                        # Modèles d'IA pré-entraînés
-│   ├── config.json                # Configuration du modèle BERT
-│   ├── model.safetensors          # Poids du modèle BERT
-│   ├── label_encoder.pkl          # Encodeur d'étiquettes
-│   ├── vocab.txt                  # Vocabulaire BERT
-│   └── ...
-│
-└── notebooks/                     # Notebooks d'entraînement et d'analyse
-    ├── classification_intention_robot.ipynb
-    └── Intent_dataset.csv         # Jeu de données d'entraînement
+VoxThymio/
+├── src/
+│   ├── smart_voice_controller.py    # Contrôleur principal
+│   ├── speech_recognizer.py         # Module de reconnaissance vocale
+│   ├── embedding_generator.py       # Génération d'embeddings sémantiques
+│   ├── embedding_manager.py         # Gestionnaire de base vectorielle
+│   ├── commands.json                # Commandes de base
+│   └── controller/
+│       └── thymio_controller.py     # Interface Thymio
+├── vector_db/                       # Base de données ChromaDB
+├── gui/                            # Interface graphique
+├── requirements.txt                # Dépendances Python
+└── README.md                       # Documentation
 ```
 
-## 🔧 Personnalisation
+## 🚀 Installation
 
-### Personnalisation des commandes existantes
+### Prérequis
+- Python 3.8+
+- Robot Thymio avec firmware compatible
+- Microphone fonctionnel
+- GPU recommandé pour de meilleures performances (optionnel)
 
-1. Ouvrez le fichier `commands.json`
-2. **Important** : Ne modifiez que le code Aseba (valeurs), pas les noms des commandes (clés)
-3. Format du fichier :
-   ```json
-   {
-     "nom_commande": "code_aseba_correspondant"
-   }
-   ```
-4. Exemple de modification du code d'une commande existante :
-   ```json
-   "avancer": "motor.left.target = 300\nmotor.right.target = 300"  // Vitesse augmentée
-   ```
+### 1. Cloner le repository
+```bash
+git clone https://github.com/TitanSage02/Vox-Thymio.git
+cd VoxThymio
+```
 
-> ⚠️ **Attention** : Le modèle BERT a été spécifiquement entraîné pour reconnaître les noms de commandes existants (les clés dans `commands.json`). Modifier ou ajouter de nouvelles clés ne fonctionnera pas sans réentraîner le modèle.
+### 2. Installer les dépendances
+```bash
+pip install -r requirements.txt
+```
 
-### Ajout de nouvelles commandes
+### 3. Configuration audio (Windows)
+```bash
+# Si pyaudio pose problème
+pip install pipwin
+pipwin install pyaudio
+```
 
-Pour ajouter une commande entièrement nouvelle, vous devez :
+## 🎯 Utilisation
 
-1. Ajouter l'entrée dans `commands.json`
-2. Réentraîner le modèle BERT (voir ci-dessous)
+### Utilisation basique
+```python
+from src.smart_voice_controller import SmartVoiceController
+from src.controller.thymio_controller import ThymioController
+import asyncio
 
-### Modification du modèle vocal
+async def main():
+    # Initialiser la connexion Thymio
+    thymio = ThymioController()
+    await thymio.connect()
+    
+    # Créer le contrôleur vocal
+    voice_controller = SmartVoiceController(thymio)
+    
+    # Traiter une commande texte
+    result = await voice_controller.process_command("avance")
+    print(result)
+    
+    # Démarrer la reconnaissance vocale
+    await voice_controller.voice_recognition()
 
-Pour améliorer la reconnaissance vocale ou ajouter de nouvelles intentions :
+asyncio.run(main())
+```
 
-1. Enrichissez le dataset dans `notebooks/Intent_dataset.csv` avec les nouvelles commandes
-2. Réentraînez le modèle avec le notebook `classification_intention_robot.ipynb`
-3. Exportez le nouveau modèle dans le dossier `models/`
+### Commandes disponibles
 
-## 🔍 Dépannage
+#### Commandes de base
+- **Mouvement** : "avance", "recule", "va tout droit"
+- **Rotation** : "tourne à droite", "tourne à gauche", "fais demi-tour"
+- **Arrêt** : "arrête", "stop", "arrête-toi"
 
-| Problème | Solution |
-|----------|----------|
-| **"Microphone non disponible"** | Vérifiez que votre microphone est connecté et autorisé dans les paramètres système |
-| **"Impossible de se connecter au Thymio"** | Assurez-vous que Thymio Suite est en cours d'exécution et qu'un robot est disponible |
-| **"Commande non reconnue"** | La parole n'a pas été correctement associée à une commande dans `commands.json`. Parlez plus clairement ou utilisez des mots-clés plus proches des commandes existantes |
-| **"Erreur de classification"** | Problème avec le modèle BERT. Vérifiez que tous les fichiers dans le dossier `models/` sont présents et non corrompus |
-| **"Erreur Whisper"** | Assurez-vous que Whisper est correctement installé. Exécutez `pip install openai-whisper` |
-| **"Modèle Whisper lent"** | Optez pour faster-whisper (`pip install faster-whisper`) et modifiez le code pour l'utiliser |
-| **Avertissements du modèle** | Ces avertissements sont généralement sans conséquence et ont été supprimés dans les dernières versions |
-| **Commande reconnue mais non exécutée** | Vérifiez la syntaxe du code Aseba dans `commands.json` |
+#### Ajouter de nouvelles commandes
+```python
+# Ajouter une commande personnalisée
+voice_controller.add_new_command(
+    command_id="dance",
+    description="faire une danse",
+    code="motor.left.target = 200\nmotor.right.target = -200\ncall prox.all"
+)
+```
 
-> ⚠️ **Important** : Si vous avez modifié les noms des commandes (clés) dans `commands.json`, le modèle BERT ne pourra pas les reconnaître. Vous devez réentraîner le modèle pour prendre en compte ces modifications.
+## 🔧 Configuration
 
-## 📄 Licence
+### Ajustement des seuils
+```python
+# Modifier les seuils de similarité
+voice_controller.update_thresholds(
+    execution_threshold=0.6,  # Seuil pour exécuter (0.0-1.0)
+    learning_threshold=0.85   # Seuil pour apprendre (0.0-1.0)
+)
+```
 
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+### Configuration audio
+Modifiez les paramètres dans `speech_recognizer.py` :
+```python
+# Configuration de reconnaissance vocale
+language = "fr-FR"          # Langue de reconnaissance
+model_size = "small"        # Taille du modèle Whisper
+energy_threshold = 300      # Seuil de détection audio
+```
 
-## 👤 Développeur
+## 📊 Fonctionnement technique
 
-**VoxThymio** a été développé par **Espérance AYIWAHOUN** pour **AI4Innov**.
+### 1. Pipeline de traitement vocal
+1. **Capture audio** → Microphone via PyAudio/SoundDevice
+2. **Reconnaissance** → Whisper ou SpeechRecognition
+3. **Normalisation** → Nettoyage et préparation du texte
+4. **Embedding** → Génération via SentenceTransformer multilingue
+5. **Recherche** → Similarité cosinus dans ChromaDB
+6. **Exécution** → Code Aseba envoyé au Thymio
+
+### 2. Modèles utilisés
+- **Reconnaissance vocale** : OpenAI Whisper ou Google Speech Recognition
+- **Embeddings sémantiques** : `paraphrase-multilingual-MiniLM-L12-v2`
+- **Base vectorielle** : ChromaDB avec distance cosinus
+- **Communication robot** : Protocol Aseba via tdmclient
+
+### 3. Système d'apprentissage
+- **Seuil d'exécution** (0.5) : Commandes reconnues sont exécutées
+- **Seuil d'apprentissage** (0.85) : Nouvelles variantes sont automatiquement ajoutées
+- **Détection de conflits** : Évite les doublons de commandes similaires
+
+## 🧪 Tests et débogage
+
+### Exécuter les tests
+```bash
+# Test du contrôleur principal
+python src/smart_voice_controller.py
+
+# Test de la reconnaissance vocale
+python src/speech_recognizer.py
+
+# Test de la communication Thymio
+python src/controller/thymio_controller.py
+```
+
+### Diagnostic des performances
+```python
+# Obtenir les statistiques du système
+stats = voice_controller.get_system_stats()
+print(f"Commandes en base: {stats['database']['total_commands']}")
+print(f"Modèle d'embedding: {stats['embedding_model']['model_name']}")
+```
+
+## 🛠️ Dépendances principales
+
+| Package | Version | Usage |
+|---------|---------|--------|
+| `tdmclient` | ≥0.1.0 | Communication Thymio |
+| `SpeechRecognition` | ≥3.10.0 | Reconnaissance vocale fallback |
+| `openai-whisper` | ≥20230314 | Reconnaissance vocale principale |
+| `transformers` | ≥4.0.0 | Modèles d'embeddings |
+| `sentence-transformers` | ≥2.2.0 | Embeddings sémantiques |
+| `chromadb` | ≥0.4.0 | Base vectorielle |
+| `torch` | ≥1.10.0 | Calculs d'embeddings |
+| `pyaudio` | ≥0.2.11 | Capture audio |
+
+## 🐛 Résolution de problèmes
+
+### Problèmes courants
+
+#### 1. Erreur de connexion Thymio
+```bash
+❌ Aucun robot Thymio détecté
+```
+**Solution** : Vérifiez que le robot est allumé et connecté via USB/Bluetooth.
+
+#### 2. Erreur PyAudio
+```bash
+❌ OSError: No Default Input Device Available
+```
+**Solution** : Vérifiez les permissions du microphone et installez PyAudio correctement.
+
+#### 3. Modèle Whisper non trouvé
+```bash
+❌ Erreur faster-whisper: model not found
+```
+**Solution** : Le modèle se télécharge automatiquement au premier usage. Vérifiez votre connexion internet.
+
+#### 4. Reconnaissance vocale imprécise
+**Solutions** :
+- Ajustez `energy_threshold` dans speech_recognizer.py
+- Parlez plus clairement et proche du microphone
+- Réduisez le bruit ambiant
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! Pour contribuer :
+
+1. Fork le projet
+2. Créez une branche feature (`git checkout -b feature/amelioration`)
+3. Commitez vos changements (`git commit -am 'Ajout de nouvelle fonctionnalité'`)
+4. Push sur la branche (`git push origin feature/amelioration`)
+5. Ouvrez une Pull Request
+
+### Standards de code
+- Suivez PEP 8 pour le style Python
+- Documentez les nouvelles fonctions avec des docstrings
+- Ajoutez des tests pour les nouvelles fonctionnalités
+- Utilisez des noms de variables explicites en français
+
+## 📝 Licence
+
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+## 👥 Auteurs
+
+- **TitanSage02** - *Développement principal* - [GitHub](https://github.com/TitanSage02)
+- **Ai4Innov** - *Organisation* 
+
+## 🙏 Remerciements
+
+- [Mobsya](https://www.mobsya.org/) pour le robot Thymio et l'écosystème de développement
+- [OpenAI](https://openai.com/) pour le modèle Whisper
+- [Sentence Transformers](https://www.sbert.net/) pour les embeddings multilingues
+- [ChromaDB](https://www.trychroma.com/) pour la base vectorielle
+- La communauté open source pour les outils et bibliothèques utilisés
+
+## 📈 Roadmap
+
+- [ ] Interface graphique complète
+- [ ] Support de commandes gestuelles
+- [ ] Intégration de commandes complexes multi-étapes
+- [ ] Support de multiples robots simultanément
+- [ ] API REST pour contrôle distant
+- [ ] Reconnaissance de l'intention contextuelle
+- [ ] Mode d'apprentissage interactif guidé
+
+---
+
+**VoxThymio** - Donnez une voix à votre robot ! 🤖🗣️

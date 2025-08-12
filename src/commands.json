@@ -1,0 +1,22 @@
+{
+  "avancer": {
+    "code": "motor.left.target = 200\nmotor.right.target = 200",
+    "description": "avancer"
+  },
+  "reculer": {
+    "code": "motor.left.target = -200\nmotor.right.target = -200",
+    "description": "reculer"
+  },
+  "arreter": {
+    "code": "motor.left.target = 0\nmotor.right.target = 0",
+    "description": "arrêter"
+  },
+  "tourner_gauche": {
+    "code": "motor.left.target = -100\nmotor.right.target = 100",
+    "description": "tourner à gauche."
+  },
+  "tourner_droite": {
+    "code": "motor.left.target = 100\nmotor.right.target = -100",
+    "description": "tourner à droite."
+  }
+}
